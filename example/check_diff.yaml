@@ -1,0 +1,9 @@
+OutputFile: .phabricator-comment.txt
+OutputFormat: phabricator
+
+JavaCheckstyle:
+  Exclude:
+    - omg.java
+
+K8sKubeLinter:
+  Enabled: True
