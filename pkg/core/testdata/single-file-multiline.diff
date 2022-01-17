@@ -1,0 +1,12 @@
+diff -r d510c3bcae65 -r 1a1658bc7ae5 .hgignore
+--- a/.hgignore	Wed Feb 05 13:56:48 2020 +0300
++++ b/.hgignore	Tue Feb 18 15:24:16 2020 +0300
+@@ -63,6 +63,8 @@
+ x/libs/*
+ x/.idea/*
+
++build/
++
+ #Ignore QtCreator project files
+ **.pro
+ **.pro.user

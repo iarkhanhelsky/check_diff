@@ -1,0 +1,6 @@
+diff -r d510c3bcae65 -r 1a1658bc7ae5 .hgmodstate
+--- a/.hgmodstate	Wed Feb 05 13:56:48 2020 +0300
++++ b/.hgmodstate	Tue Feb 18 15:24:16 2020 +0300
+@@ -1,1 +1,1 @@
+-7f7a131ae53193d9eaf74f0f9e5f3a0915814aac ../x hg ../x .
++00601905657c96d76f35204a2dbedc4cd29a061d ../x hg ../x .

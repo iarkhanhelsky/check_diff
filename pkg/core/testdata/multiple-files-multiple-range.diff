@@ -1,0 +1,33 @@
+diff -r 9f7313c4c5cc A.txt
+--- a/A.txt	Fri Feb 28 12:02:07 2020 +0300
++++ b/A.txt	Fri Feb 28 12:03:18 2020 +0300
+@@ -1,10 +1,10 @@
+ 1
+ 2
+-2
++2 Hello
+ 3
+-4
++4 World
+ 4
+ 5
+-6
++6 Hello
+ 7
+ 
+diff -r 9f7313c4c5cc B.txt
+--- a/B.txt	Fri Feb 28 12:02:07 2020 +0300
++++ b/B.txt	Fri Feb 28 12:03:18 2020 +0300
+@@ -1,9 +1,7 @@
+-1
+-2
+ 3
+ 4
+ 5
+-6
+-7
+-8
++6 Hello
++7 World
++8 Test
+ 9

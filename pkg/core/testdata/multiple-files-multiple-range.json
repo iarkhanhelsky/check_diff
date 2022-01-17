@@ -1,0 +1,22 @@
+[
+    {
+        "file": "A.txt",
+        "start": 3,
+        "end": 3
+    },
+    {
+        "file": "A.txt",
+        "start": 5,
+        "end": 5
+    },
+    {
+        "file": "A.txt",
+        "start": 8,
+        "end": 8
+    },
+    {
+        "file": "B.txt",
+        "start": 4,
+        "end": 6
+    }
+]

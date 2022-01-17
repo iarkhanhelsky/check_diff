@@ -1,0 +1,16 @@
+changeset:   37428:c93d12649e23
+parent:      37422:9c56c7a914be
+user:        author <author@project.com>
+date:        Wed Feb 26 16:34:02 2020 +0300
+summary:     Revert
+
+diff -r 9c56c7a914be -r c93d12649e23 .hgmodstate
+--- a/.hgmodstate	Wed Feb 26 15:38:22 2020 +0300
++++ b/.hgmodstate	Wed Feb 26 16:34:02 2020 +0300
+@@ -1,3 +1,3 @@
+-56db6de56e18a72243b9da211ea023a2f0e07a48 ../x hg ../x .
++07084a7509ff508b9813391e1c24368df783c6a3 ../x hg ../x .
+ 738c83f3bb07691b924f8acad496f02c717772d4 ../y hg ../y .
+-7f7a131ae53193d9eaf74f0f9e5f3a0915814aac ../z hg ../z .
++c18eea58bd204804d70ec6b9edadeda5b014325b ../z hg ../z .
+
