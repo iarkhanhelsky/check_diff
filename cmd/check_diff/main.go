@@ -6,6 +6,7 @@ import (
 	"github.com/iarkhanhelsky/check_diff/pkg/checker/k8s_kubelint"
 	"github.com/iarkhanhelsky/check_diff/pkg/command"
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
+	"github.com/iarkhanhelsky/check_diff/pkg/formatter/stdout"
 	"os"
 	"path"
 )
@@ -27,10 +28,21 @@ func main() {
 		}
 	}
 
-	for _, checker := range enabledCheckers {
-		checker.Check([]core.LineRange{})
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v", err)
+		os.Exit(2)
 	}
 
+	var issues []core.Issue
+	for _, checker := range enabledCheckers {
+		checked, err := checker.Check([]core.LineRange{})
+		if err != nil {
+			panic(err)
+		}
+		issues = append(issues, checked...)
+	}
+
+	err = (&stdout.Formatter{}).Print(issues, os.Stdout)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v", err)
 		os.Exit(2)

@@ -21,6 +21,8 @@ func (*Formatter) Supports() []formatter.Format {
 }
 
 func (formatter *Formatter) Print(issues []core.Issue, w io.Writer) error {
+	formatter.printer = newPrinter(w)
+
 	if len(issues) == 0 {
 		return nil
 	}
@@ -98,7 +100,7 @@ func rjust(s string, ch byte, size int) string {
 }
 
 func countUniqFiles(issues []core.Issue) int {
-	var fileset map[string]int
+	fileset := make(map[string]int, 0)
 	for _, issue := range issues {
 		fileset[issue.File] = 1
 	}
