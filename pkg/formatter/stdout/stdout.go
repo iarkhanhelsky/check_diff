@@ -2,16 +2,18 @@ package stdout
 
 import (
 	"fmt"
+	"github.com/fatih/color"
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
 	"github.com/iarkhanhelsky/check_diff/pkg/formatter"
 	"io"
 	"math"
+	"os"
 	"strconv"
 	"strings"
 )
 
 type Formatter struct {
-	printer     printer
+	writer      io.Writer
 	currentFile string
 	fileReader  core.FileReader
 }
@@ -21,7 +23,7 @@ func (*Formatter) Supports() []formatter.Format {
 }
 
 func (formatter *Formatter) Print(issues []core.Issue, w io.Writer) error {
-	formatter.printer = newPrinter(w)
+	formatter.writer = w
 
 	if len(issues) == 0 {
 		return nil
@@ -35,28 +37,32 @@ func (formatter *Formatter) Print(issues []core.Issue, w io.Writer) error {
 	}
 
 	uniqFiles := countUniqFiles(issues)
-	return formatter.println(fmt.Sprintf("Total: %d in %d files", len(issues), uniqFiles))
-}
+	_, err := fmt.Fprintf(formatter.writer, "Total: %d in %d files\n", len(issues), uniqFiles)
+	if err != nil {
+		return err
+	}
 
-func (formatter *Formatter) println(str string) error {
-	return formatter.printer.println(str)
+	return nil
 }
 
 func (formatter *Formatter) printIssue(issue core.Issue) error {
-	w := formatter.printer.w()
-	err := w(fmt.Sprintf("%s:%d", issue.File, issue.Line)) // white, bright
+
+	_, err := color.New(color.FgHiWhite, color.Bold).Fprintf(formatter.writer, "%s:%d\n", issue.File, issue.Line)
 	if err != nil {
 		return err
 	}
-	err = w(fmt.Sprintf("[%s] %s", issue.Severity, issue.Message)) // magenta, bright
+
+	_, err = color.New(color.FgHiMagenta, color.Bold).Fprintf(formatter.writer, "[%s] %s\n", issue.Severity, issue.Message)
 	if err != nil {
 		return err
 	}
+
 	err = formatter.fileBanner(issue)
 	if err != nil {
 		return err
 	}
-	err = formatter.println("")
+
+	_, err = fmt.Fprintln(formatter.writer, "")
 	if err != nil {
 		return err
 	}
@@ -65,9 +71,9 @@ func (formatter *Formatter) printIssue(issue core.Issue) error {
 }
 
 func (formatter *Formatter) fileBanner(issue core.Issue) error {
-	w := formatter.printer.w()
 	contextLines, offset, err := formatter.readContext(issue.File)
 	if err != nil {
+		fmt.Fprintf(os.Stderr, "err reading file: %s: %v\n", issue.File, err)
 		// log to stderr
 		return nil
 	}
@@ -75,13 +81,13 @@ func (formatter *Formatter) fileBanner(issue core.Issue) error {
 	margin := int(math.Ceil(math.Log10(float64(offset + len(contextLines)))))
 	for i, line := range contextLines {
 		l := offset + i
-		err := w(fmt.Sprintf("%"+strconv.Itoa(margin)+"d:%s", l, line)) // white, dim
+		_, err := color.New(color.FgWhite).Fprintf(formatter.writer, "%"+strconv.Itoa(margin)+"d:%s\n", l, line)
 		if err != nil {
 			return err
 		}
 		if l == issue.Line {
 			// TODO: print line number with bg_magenta, bright
-			err := w(rjust("^", ' ', margin+1+issue.Column)) // white, bright
+			_, err = color.New(color.FgWhite).Fprintf(formatter.writer, rjust("^", ' ', margin+1+issue.Column)) // white, bright
 			if err != nil {
 				return err
 			}
