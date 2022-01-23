@@ -17,11 +17,12 @@ func parseSarif(reportBytes []byte) ([]core.Issue, error) {
 			file, line, column := extractLocation(result.Locations)
 
 			issues = append(issues, core.Issue{
-				Tag:     *result.RuleID,
-				Message: *result.Message.Text,
-				File:    file,
-				Line:    line,
-				Column:  column,
+				Tag:      *result.RuleID,
+				Message:  *result.Message.Text,
+				File:     file,
+				Line:     line,
+				Column:   column,
+				Severity: "error",
 			})
 		}
 	}
@@ -51,6 +52,6 @@ func extractLocation(locations []*sarif.Location) (string, int, int) {
 	if location.Region.EndLine != nil {
 		column = *location.Region.StartColumn
 	}
-	
+
 	return file, line, column
 }

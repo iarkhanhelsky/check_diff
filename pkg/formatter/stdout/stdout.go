@@ -13,9 +13,15 @@ import (
 )
 
 type Formatter struct {
-	writer      io.Writer
-	currentFile string
-	fileReader  core.FileReader
+	writer        writer
+	currentFile   string
+	contextReader contextReader
+}
+
+func NewFormatter() formatter.Formatter {
+	return &Formatter{
+		contextReader: newCachedFileContext(5),
+	}
 }
 
 func (*Formatter) Supports() []formatter.Format {
@@ -23,86 +29,62 @@ func (*Formatter) Supports() []formatter.Format {
 }
 
 func (formatter *Formatter) Print(issues []core.Issue, w io.Writer) error {
-	formatter.writer = w
+	formatter.writer = writer{w: w}
 
 	if len(issues) == 0 {
 		return nil
 	}
 
 	for _, issue := range issues {
-		err := formatter.printIssue(issue)
-		if err != nil {
-			return err
-		}
+		formatter.writer.color(color.FgWhite, color.Bold).printf("%s:%d\n", issue.File, issue.Line).reset()
+		formatter.writer.color(color.FgHiMagenta, color.Bold).printf("[%s] %s\n", issue.Severity, issue.Message).reset()
+		formatter.fileBanner(issue)
+		formatter.writer.printf("\n")
 	}
 
 	uniqFiles := countUniqFiles(issues)
-	_, err := fmt.Fprintf(formatter.writer, "Total: %d in %d files\n", len(issues), uniqFiles)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	formatter.writer.color().printf("Total: %d in %d files\n", len(issues), uniqFiles).reset()
+	return formatter.writer.err()
 }
 
-func (formatter *Formatter) printIssue(issue core.Issue) error {
-
-	_, err := color.New(color.FgHiWhite, color.Bold).Fprintf(formatter.writer, "%s:%d\n", issue.File, issue.Line)
-	if err != nil {
-		return err
-	}
-
-	_, err = color.New(color.FgHiMagenta, color.Bold).Fprintf(formatter.writer, "[%s] %s\n", issue.Severity, issue.Message)
-	if err != nil {
-		return err
-	}
-
-	err = formatter.fileBanner(issue)
-	if err != nil {
-		return err
-	}
-
-	_, err = fmt.Fprintln(formatter.writer, "")
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (formatter *Formatter) fileBanner(issue core.Issue) error {
-	contextLines, offset, err := formatter.readContext(issue.File)
+func (formatter *Formatter) fileBanner(issue core.Issue) {
+	contextLines, offset, err := formatter.readContext(issue.File, issue.Line)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "err reading file: %s: %v\n", issue.File, err)
-		// log to stderr
-		return nil
+		return
 	}
 
 	margin := int(math.Ceil(math.Log10(float64(offset + len(contextLines)))))
 	for i, line := range contextLines {
-		l := offset + i
-		_, err := color.New(color.FgWhite).Fprintf(formatter.writer, "%"+strconv.Itoa(margin)+"d:%s\n", l, line)
-		if err != nil {
-			return err
-		}
+		l := offset + i + 1
+		w := formatter.writer.color(color.FgWhite)
 		if l == issue.Line {
-			// TODO: print line number with bg_magenta, bright
-			_, err = color.New(color.FgWhite).Fprintf(formatter.writer, rjust("^", ' ', margin+1+issue.Column)) // white, bright
-			if err != nil {
-				return err
-			}
+			w = formatter.writer.color(color.Bold, color.BgMagenta)
+		}
+		w.printf("%"+strconv.Itoa(margin)+"d:", l)
+
+		w = formatter.writer
+		if l == issue.Line {
+			w = formatter.writer.color(color.FgHiWhite)
+		}
+		w = w.printf(" %s\n", line).reset()
+
+		if l == issue.Line {
+			w.color(color.FgWhite, color.Bold).printf(rjust("", ' ', margin+2+issue.Column) + "^\n")
 		}
 	}
-
-	return nil
 }
 
-func (formatter *Formatter) readContext(file string) ([]string, int, error) {
-	return nil, 0, nil
+func (formatter *Formatter) readContext(file string, line int) ([]string, int, error) {
+	return formatter.contextReader.readContext(file, line)
 }
 
 func rjust(s string, ch byte, size int) string {
-	return strings.Repeat(string(ch), len(s)-size)
+	if len(s) < size {
+		return strings.Repeat(string(ch), size-len(s))
+	}
+
+	return s
 }
 
 func countUniqFiles(issues []core.Issue) int {

@@ -42,7 +42,7 @@ func main() {
 		issues = append(issues, checked...)
 	}
 
-	err = (&stdout.Formatter{}).Print(issues, os.Stdout)
+	err = stdout.NewFormatter().Print(issues, os.Stdout)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v", err)
 		os.Exit(2)
