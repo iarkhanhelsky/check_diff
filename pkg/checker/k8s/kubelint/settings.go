@@ -4,6 +4,6 @@ import (
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
 )
 
-type Options struct {
-	core.Options `yaml:"KubeLinter"`
+type Settings struct {
+	core.Settings
 }

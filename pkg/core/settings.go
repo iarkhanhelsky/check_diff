@@ -1,6 +1,6 @@
 package core
 
-type Options struct {
+type Settings struct {
 	Exclude []string `yaml:"Exclude"`
 	Include []string `yaml:"Include"`
 	Command string   `yaml:"Command"`

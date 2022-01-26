@@ -2,10 +2,7 @@ package app
 
 import (
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
-	"io/ioutil"
-	"os"
-
-	yaml "gopkg.in/yaml.v2"
+	"go.uber.org/config"
 )
 
 const defaultConfigName = "check_diff.yaml"
@@ -29,19 +26,6 @@ func newConfig() Config {
 	}
 }
 
-func ParseConfig(path string) (Config, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return Config{}, err
-	}
-	defer file.Close()
-
-	bytes, err := ioutil.ReadAll(file)
-	if err != nil {
-		return Config{}, err
-	}
-
-	config := newConfig()
-	err = yaml.Unmarshal(bytes, &config)
-	return config, err
+func newYaml(options Options) (*config.YAML, error) {
+	return config.NewYAML(config.File(options.ConfigFile))
 }

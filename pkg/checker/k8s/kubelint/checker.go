@@ -11,6 +11,7 @@ import (
 
 type K8sKubeLint struct {
 	kubeLint string
+	settings Settings
 }
 
 var _ core.Checker = &K8sKubeLint{}
@@ -46,6 +47,6 @@ func (linter *K8sKubeLint) handleDownload(dstPath string) error {
 	return nil
 }
 
-func NewK8KubeLint() core.Checker {
-	return &K8sKubeLint{}
+func NewK8KubeLint(settings Settings) core.Checker {
+	return &K8sKubeLint{settings: settings}
 }

@@ -22,10 +22,10 @@ Include:
 Command: check_java
 Config: check_java.xml
 `
-	opts := Options{}
+	opts := Settings{}
 	err := yaml.Unmarshal([]byte(raw), &opts)
 	assert.NoError(err)
-	assert.Equal(Options{
+	assert.Equal(Settings{
 		Exclude: []string{"gen/*.java"},
 		Include: []string{"src/main/java/**"},
 		Command: "check_java",

@@ -5,7 +5,7 @@ import (
 )
 
 type Options struct {
-	core.Options `yaml:"JavaCheckstyle"`
+	core.Settings `yaml:"JavaCheckstyle"`
 }
 
 func (opts *Options) Validate() error {
