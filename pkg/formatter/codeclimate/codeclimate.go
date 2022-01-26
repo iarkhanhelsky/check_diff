@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
-	"github.com/iarkhanhelsky/check_diff/pkg/formatter"
 	"io"
 	"strconv"
 )
@@ -46,10 +45,10 @@ type lines struct {
 	begin int `json:"begin"`
 }
 
-var _ formatter.Formatter = &Formatter{}
+var _ core.Formatter = &Formatter{}
 
-func (cc *Formatter) Supports() []formatter.Format {
-	return []formatter.Format{formatter.Codeclimate, formatter.Gitlab}
+func (cc *Formatter) Supports() []core.Format {
+	return []core.Format{core.Codeclimate, core.Gitlab}
 }
 
 func (cc *Formatter) Print(issues []core.Issue, w io.Writer) error {

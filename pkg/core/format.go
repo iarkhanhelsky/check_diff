@@ -1,4 +1,4 @@
-package formatter
+package core
 
 type Format string
 

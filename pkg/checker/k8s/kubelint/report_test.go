@@ -1,4 +1,4 @@
-package k8s_kubelint
+package kubelint
 
 import (
 	"github.com/owenrumney/go-sarif/sarif"

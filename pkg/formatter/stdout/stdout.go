@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/fatih/color"
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
-	"github.com/iarkhanhelsky/check_diff/pkg/formatter"
 	"io"
 	"math"
 	"os"
@@ -18,14 +17,14 @@ type Formatter struct {
 	contextReader contextReader
 }
 
-func NewFormatter() formatter.Formatter {
+func NewFormatter() core.Formatter {
 	return &Formatter{
 		contextReader: newCachedFileContext(5),
 	}
 }
 
-func (*Formatter) Supports() []formatter.Format {
-	return []formatter.Format{formatter.STDOUT}
+func (*Formatter) Supports() []core.Format {
+	return []core.Format{core.STDOUT}
 }
 
 func (formatter *Formatter) Print(issues []core.Issue, w io.Writer) error {

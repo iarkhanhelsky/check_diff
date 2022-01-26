@@ -1,14 +1,15 @@
-package java_checkstyle
+package checkstyle
 
 import (
-	"github.com/iarkhanhelsky/check_diff/pkg/checker"
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
 )
 
-type JavaCheckstyleOptions struct {
-	checker.Options
+type Options struct {
+	core.Options `yaml:"JavaCheckstyle"`
+}
 
-	CheckstyleConfig string `yaml:"CheckstyleConfig"`
+func (opts *Options) Validate() error {
+	return nil
 }
 
 type JavaCheckstyle struct {
@@ -35,4 +36,4 @@ func (j JavaCheckstyle) Check(ranges []core.LineRange) ([]core.Issue, error) {
 	panic("implement me")
 }
 
-var _ checker.Checker = &JavaCheckstyle{}
+var _ core.Checker = &JavaCheckstyle{}

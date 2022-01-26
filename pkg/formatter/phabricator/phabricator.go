@@ -3,7 +3,6 @@ package phabricator
 import (
 	"encoding/json"
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
-	"github.com/iarkhanhelsky/check_diff/pkg/formatter"
 	"io"
 )
 
@@ -25,10 +24,10 @@ type issue struct {
 
 type Formatter struct{}
 
-var _ formatter.Formatter = &Formatter{}
+var _ core.Formatter = &Formatter{}
 
-func (*Formatter) Supports() []formatter.Format {
-	return []formatter.Format{formatter.Phabricator}
+func (*Formatter) Supports() []core.Format {
+	return []core.Format{core.Phabricator}
 }
 
 func (*Formatter) Print(issues []core.Issue, w io.Writer) error {

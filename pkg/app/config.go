@@ -1,6 +1,7 @@
-package command
+package app
 
 import (
+	"github.com/iarkhanhelsky/check_diff/pkg/core"
 	"io/ioutil"
 	"os"
 
@@ -18,6 +19,14 @@ type Config struct {
 	OutputFormat string `yaml:"OutputFormat"`
 	OutputFile   string `yaml:"OutputFile"`
 	VendorDir    string `yaml:"VendorDir"`
+	Color        bool   `yaml:"Color"`
+}
+
+func newConfig() Config {
+	return Config{
+		OutputFormat: string(core.STDOUT),
+		VendorDir:    defaultVendorDir,
+	}
 }
 
 func ParseConfig(path string) (Config, error) {
@@ -32,7 +41,7 @@ func ParseConfig(path string) (Config, error) {
 		return Config{}, err
 	}
 
-	var config Config
+	config := newConfig()
 	err = yaml.Unmarshal(bytes, &config)
 	return config, err
 }

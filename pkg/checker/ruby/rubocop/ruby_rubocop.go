@@ -1,4 +1,4 @@
-package ruby_rubocop
+package rubocop
 
 type RubyRubocop struct {
 }

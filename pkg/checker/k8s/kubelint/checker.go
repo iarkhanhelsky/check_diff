@@ -1,9 +1,8 @@
-package k8s_kubelint
+package kubelint
 
 import (
 	"bytes"
 	"errors"
-	"github.com/iarkhanhelsky/check_diff/pkg/checker"
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
 	"os"
 	"os/exec"
@@ -14,7 +13,7 @@ type K8sKubeLint struct {
 	kubeLint string
 }
 
-var _ checker.Checker = &K8sKubeLint{}
+var _ core.Checker = &K8sKubeLint{}
 
 func (linter *K8sKubeLint) Setup() {
 
@@ -47,6 +46,6 @@ func (linter *K8sKubeLint) handleDownload(dstPath string) error {
 	return nil
 }
 
-func NewK8KubeLint() checker.Checker {
+func NewK8KubeLint() core.Checker {
 	return &K8sKubeLint{}
 }
