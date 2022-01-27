@@ -5,5 +5,5 @@ JavaCheckstyle:
   Exclude:
     - omg.java
 
-K8sKubeLinter:
+KubeLinter:
   Enabled: True

@@ -1,6 +1,7 @@
 package kubelint
 
 import (
+	"fmt"
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
 	"github.com/owenrumney/go-sarif/sarif"
 )
@@ -8,7 +9,7 @@ import (
 func parseSarif(reportBytes []byte) ([]core.Issue, error) {
 	report, err := sarif.FromBytes(reportBytes)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse sarif report: %v: %s", err, string(reportBytes))
 	}
 
 	var issues []core.Issue

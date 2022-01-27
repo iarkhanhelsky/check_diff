@@ -3,10 +3,12 @@ package kubelint
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
 	"os"
 	"os/exec"
 	"path"
+	"strings"
 )
 
 type K8sKubeLint struct {
@@ -21,17 +23,35 @@ func (linter *K8sKubeLint) Setup() {
 }
 
 func (linter *K8sKubeLint) Check(ranges []core.LineRange) ([]core.Issue, error) {
-	args := []string{"lint", "--format", "sarif", "k8s/deployment.yaml"}
+	args := []string{"lint", "--format", "sarif"}
+	var hasInput bool
 	for _, r := range ranges {
-		args = append(args, r.File)
+		if strings.HasSuffix(r.File, ".yaml") {
+			args = append(args, r.File)
+			hasInput = true
+		}
 	}
+
+	if !hasInput {
+		return []core.Issue{}, nil
+	}
+
 	cmd := exec.Command(linter.kubeLint, args...)
 
-	var out bytes.Buffer
-	cmd.Stdout = &out
-	cmd.Run()
+	var stdout, stderr bytes.Buffer
 
-	return parseSarif(out.Bytes())
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+
+	if err := cmd.Run(); err != nil && cmd.ProcessState.ExitCode() != 1 {
+		return nil, fmt.Errorf("failed to run kube-lint: %v: %s", err, string(stderr.Bytes()))
+	}
+
+	issues, err := parseSarif(stdout.Bytes())
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert issues: %v", err)
+	}
+	return issues, nil
 }
 
 func (linter *K8sKubeLint) handleDownload(dstPath string) error {

@@ -10,7 +10,7 @@ import (
 func newFormatter(options Options) core.Formatter {
 	switch options.Format {
 	case "stdout":
-		return &stdout.Formatter{}
+		return stdout.NewFormatter()
 	case "gitlab":
 		return &codeclimate.Formatter{}
 	case "phabricator":
