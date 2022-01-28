@@ -1,4 +1,4 @@
-package kubelint
+package kubelinter
 
 import (
 	"bytes"
@@ -8,32 +8,30 @@ import (
 	"os"
 	"os/exec"
 	"path"
-	"strings"
 )
 
-type K8sKubeLint struct {
+var defaultCliArgs = []string{"lint", "--format", "sarif"}
+
+type KubeLinter struct {
 	kubeLint string
 	settings Settings
 }
 
-var _ core.Checker = &K8sKubeLint{}
+var _ core.Checker = &KubeLinter{}
 
-func (linter *K8sKubeLint) Setup() {
+func (linter *KubeLinter) Setup() {
 
 }
 
-func (linter *K8sKubeLint) Check(ranges []core.LineRange) ([]core.Issue, error) {
-	args := []string{"lint", "--format", "sarif"}
-	var hasInput bool
-	for _, r := range ranges {
-		if strings.HasSuffix(r.File, ".yaml") {
-			args = append(args, r.File)
-			hasInput = true
-		}
-	}
+func (linter *KubeLinter) Check(ranges []core.LineRange) ([]core.Issue, error) {
+	args := append(make([]string, 0), defaultCliArgs...)
 
-	if !hasInput {
+	matchedRanges := linter.settings.Filter(ranges, ".yaml", ".yml")
+	if len(matchedRanges) == 0 {
 		return []core.Issue{}, nil
+	}
+	for _, r := range matchedRanges {
+		args = append(args, r.File)
 	}
 
 	cmd := exec.Command(linter.kubeLint, args...)
@@ -54,7 +52,7 @@ func (linter *K8sKubeLint) Check(ranges []core.LineRange) ([]core.Issue, error) 
 	return issues, nil
 }
 
-func (linter *K8sKubeLint) handleDownload(dstPath string) error {
+func (linter *KubeLinter) handleDownload(dstPath string) error {
 	kubelint := path.Join(dstPath, "kube-linter", "kube-linter")
 	if _, err := os.Stat(kubelint); errors.Is(err, os.ErrNotExist) {
 		return err
@@ -68,5 +66,5 @@ func (linter *K8sKubeLint) handleDownload(dstPath string) error {
 }
 
 func NewK8KubeLint(settings Settings) core.Checker {
-	return &K8sKubeLint{settings: settings}
+	return &KubeLinter{settings: settings}
 }

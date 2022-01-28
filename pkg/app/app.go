@@ -2,7 +2,7 @@ package app
 
 import (
 	"context"
-	"github.com/iarkhanhelsky/check_diff/pkg/checker/k8s/kubelint"
+	"github.com/iarkhanhelsky/check_diff/pkg/checker/k8s/kubelinter"
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
 	"go.uber.org/fx"
 	"io"
@@ -19,7 +19,7 @@ func Main() {
 
 	app := fx.New(fx.Options(
 		Module,
-		kubelint.Module,
+		kubelinter.Module,
 		fx.Populate(&formatter, &checker, &options, &config),
 	))
 	app.Start(context.Background())

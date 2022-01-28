@@ -1,8 +1,8 @@
-package kubelint
+package kubelinter
 
 import "github.com/iarkhanhelsky/check_diff/pkg/core"
 
-func (linter *K8sKubeLint) Downloads() []core.Downloader {
+func (linter *KubeLinter) Downloads() []core.Downloader {
 	return []core.Downloader{
 		core.NewZipDownloader(linter.handleDownload, "kube-linter",
 			"58b4a9b8d55c1997c866471c14bbcb3a",

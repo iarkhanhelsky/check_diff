@@ -6,4 +6,3 @@ JavaCheckstyle:
     - omg.java
 
 KubeLinter:
-  Enabled: True

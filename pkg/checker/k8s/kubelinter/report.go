@@ -1,4 +1,4 @@
-package kubelint
+package kubelinter
 
 import (
 	"fmt"
