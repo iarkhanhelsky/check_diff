@@ -7,11 +7,11 @@ import (
 	"testing"
 )
 
-type OptionsTestSuite struct {
+type SettingsTestSuite struct {
 	suite.Suite
 }
 
-func (s *OptionsTestSuite) TestUnmarshal() {
+func (s *SettingsTestSuite) TestUnmarshal() {
 	assert := assert.New(s.T())
 
 	raw := `
@@ -33,6 +33,26 @@ Config: check_java.xml
 	}, opts)
 }
 
+func (s *SettingsTestSuite) TestMatch() {
+	type fixture struct {
+		path    string
+		pattern string
+		matches bool
+	}
+
+	fixtures := []fixture{
+		{"a/b/c/d", "a/b/**", true},
+		{"a/b/c/d", "a/**/d", true},
+		{"a/b/c/.d", "a/**/.d", true},
+	}
+
+	for _, f := range fixtures {
+		s.T().Run(f.pattern, func(t *testing.T) {
+			assert.Equal(t, f.matches, matchGlob(f.path, f.pattern))
+		})
+	}
+}
+
 func TestOptions(t *testing.T) {
-	suite.Run(t, new(OptionsTestSuite))
+	suite.Run(t, new(SettingsTestSuite))
 }

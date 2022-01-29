@@ -3,6 +3,7 @@ module github.com/iarkhanhelsky/check_diff
 go 1.17
 
 require (
+	github.com/danwakefield/fnmatch v0.0.0-20160403171240-cbb64ac3d964 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/klauspost/compress v1.13.5 // indirect

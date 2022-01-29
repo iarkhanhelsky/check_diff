@@ -1,7 +1,7 @@
 package core
 
 import (
-	"path/filepath"
+	"github.com/danwakefield/fnmatch"
 	"strings"
 )
 
@@ -28,7 +28,7 @@ func (settings Settings) isIncluded(r LineRange) bool {
 	}
 
 	for _, pattern := range settings.Include {
-		if match, _ := filepath.Match(pattern, r.File); match {
+		if matchGlob(pattern, r.File) {
 			return true
 		}
 	}
@@ -42,7 +42,7 @@ func (settings Settings) isExcluded(r LineRange) bool {
 	}
 
 	for _, pattern := range settings.Exclude {
-		if match, _ := filepath.Match(pattern, r.File); match {
+		if matchGlob(pattern, r.File) {
 			return true
 		}
 	}
@@ -62,4 +62,8 @@ func matchesExtensions(r LineRange, extensions []string) bool {
 	}
 
 	return false
+}
+
+func matchGlob(pattern string, path string) bool {
+	return fnmatch.Match(pattern, path, 0)
 }
