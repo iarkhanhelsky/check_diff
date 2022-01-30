@@ -6,6 +6,7 @@ import (
 )
 
 type Settings struct {
+	Enabled bool     `yaml:"Enabled"`
 	Exclude []string `yaml:"Exclude"`
 	Include []string `yaml:"Include"`
 	Command string   `yaml:"Command"`

@@ -1,8 +1,10 @@
 CheckDiff:
   OutputFormat: stdout
 
-JavaCheckstyle:
+Checkstyle:
+  Enabled: true
   Exclude:
     - omg.java
 
 KubeLinter:
+  Enabled: true
