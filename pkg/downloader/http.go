@@ -1,4 +1,4 @@
-package core
+package downloader
 
 import (
 	"crypto/md5"
@@ -13,25 +13,19 @@ import (
 	"path"
 )
 
-type Downloader interface {
-	Download(dstFolder string) error
-}
-
-type DownloadHandler func(path string) error
-
-type downloader struct {
+type httpDownloader struct {
 	urls    []string
 	md5     string
 	sha256  string
 	dstFile string
-	handler DownloadHandler
+	handler Handler
 }
 
-func NewDownloader(handler DownloadHandler, dstFile string, md5 string, sha256 string, urls ...string) Downloader {
-	return &downloader{urls, md5, sha256, dstFile, handler}
+func NewHTTPDownloader(handler Handler, dstFile string, md5 string, sha256 string, urls ...string) Interface {
+	return &httpDownloader{urls, md5, sha256, dstFile, handler}
 }
 
-func (d *downloader) Download(dstFolder string) error {
+func (d *httpDownloader) Download(dstFolder string) error {
 	var accumulatedErrors []error
 
 	dstFile := path.Join(dstFolder, d.dstFile)
@@ -54,7 +48,7 @@ func (d *downloader) Download(dstFolder string) error {
 	return d.handler(dstFolder)
 }
 
-func (d *downloader) downloadFrom(url string, outputFile string) error {
+func (d *httpDownloader) downloadFrom(url string, outputFile string) error {
 	resp, err := http.Get(url)
 	defer resp.Body.Close()
 	if err != nil {
@@ -81,7 +75,7 @@ func (d *downloader) downloadFrom(url string, outputFile string) error {
 	return nil
 }
 
-func (d *downloader) ensurePath() (string, error) {
+func (d *httpDownloader) ensurePath() (string, error) {
 	return "", nil
 }
 
@@ -113,7 +107,7 @@ func checkSHA256(bytes []byte, sha1sum string) error {
 	return nil
 }
 
-func (d *downloader) isUptodate(dstFile string) bool {
+func (d *httpDownloader) isUptodate(dstFile string) bool {
 	if len(d.md5) == 0 && len(d.sha256) == 0 {
 		// No way to check, always outdated
 		return false

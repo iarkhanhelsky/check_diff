@@ -2,6 +2,7 @@ package checkstyle
 
 import (
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
+	"github.com/iarkhanhelsky/check_diff/pkg/downloader"
 )
 
 type Options struct {
@@ -15,9 +16,9 @@ func (opts *Options) Validate() error {
 type JavaCheckstyle struct {
 }
 
-func (j JavaCheckstyle) Downloads() []core.Downloader {
-	return []core.Downloader{
-		core.NewDownloader(func(path string) error {
+func (j JavaCheckstyle) Downloads() []downloader.Interface {
+	return []downloader.Interface{
+		downloader.NewHTTPDownloader(func(path string) error {
 			return nil
 		}, "checkstyle-all.jar",
 			"ab3891e43b4bc41371d66b2ec615375d",

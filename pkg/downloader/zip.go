@@ -1,4 +1,4 @@
-package core
+package downloader
 
 import (
 	"context"
@@ -6,18 +6,18 @@ import (
 	"path"
 )
 
-var _ Downloader = &zipDownloader{}
+var _ Interface = &zipDownloader{}
 
 type zipDownloader struct {
-	inner   Downloader
+	inner   Interface
 	zipDir  string
 	dstFile string
-	handler DownloadHandler
+	handler Handler
 }
 
-func NewZipDownloader(handler DownloadHandler, dstFile string, md5 string, sha256 string, urls ...string) Downloader {
+func NewZipDownloader(handler Handler, dstFile string, md5 string, sha256 string, urls ...string) Interface {
 	d := zipDownloader{dstFile: dstFile, handler: handler}
-	d.inner = NewDownloader(d.handleDownload, dstFile+".zip", md5, sha256, urls...)
+	d.inner = NewHTTPDownloader(d.handleDownload, dstFile+".zip", md5, sha256, urls...)
 	return &d
 }
 
