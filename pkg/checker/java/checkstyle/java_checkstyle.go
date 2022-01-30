@@ -5,12 +5,8 @@ import (
 	"github.com/iarkhanhelsky/check_diff/pkg/downloader"
 )
 
-type Options struct {
+type Settings struct {
 	core.Settings `yaml:"JavaCheckstyle"`
-}
-
-func (opts *Options) Validate() error {
-	return nil
 }
 
 type JavaCheckstyle struct {
@@ -27,14 +23,8 @@ func (j JavaCheckstyle) Downloads() []downloader.Interface {
 	}
 }
 
-func (j JavaCheckstyle) Setup() {
-	//TODO implement me
-	panic("implement me")
-}
-
 func (j JavaCheckstyle) Check(ranges []core.LineRange) ([]core.Issue, error) {
-	//TODO implement me
-	panic("implement me")
+	return []core.Issue{}, nil
 }
 
 var _ core.Checker = &JavaCheckstyle{}
