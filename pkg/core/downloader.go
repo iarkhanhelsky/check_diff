@@ -9,6 +9,7 @@ import (
 	"io/fs"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"path"
 )
 
@@ -33,22 +34,27 @@ func NewDownloader(handler DownloadHandler, dstFile string, md5 string, sha256 s
 func (d *downloader) Download(dstFolder string) error {
 	var accumulatedErrors []error
 
-	for _, url := range d.urls {
-		err := d.downloadFrom(url, dstFolder)
-		if err == nil {
-			return nil
+	dstFile := path.Join(dstFolder, d.dstFile)
+	if !d.isUptodate(dstFile) {
+		for _, url := range d.urls {
+			err := d.downloadFrom(url, dstFile)
+			if err == nil {
+				break
+			}
+
+			accumulatedErrors = append(accumulatedErrors, err)
 		}
 
-		accumulatedErrors = append(accumulatedErrors, err)
+		if len(accumulatedErrors) > 0 {
+			// TODO: Pretty error output
+			return fmt.Errorf("%v", accumulatedErrors)
+		}
 	}
 
-	// TODO: Pretty error output
-	return fmt.Errorf("%v", accumulatedErrors)
+	return d.handler(dstFolder)
 }
 
-func (d *downloader) downloadFrom(url string, dstFolder string) error {
-	outputFile := path.Join(dstFolder, d.dstFile)
-
+func (d *downloader) downloadFrom(url string, outputFile string) error {
 	resp, err := http.Get(url)
 	defer resp.Body.Close()
 	if err != nil {
@@ -72,7 +78,7 @@ func (d *downloader) downloadFrom(url string, dstFolder string) error {
 		return err
 	}
 
-	return d.handler(dstFolder)
+	return nil
 }
 
 func (d *downloader) ensurePath() (string, error) {
@@ -105,4 +111,30 @@ func checkSHA256(bytes []byte, sha1sum string) error {
 	}
 
 	return nil
+}
+
+func (d *downloader) isUptodate(dstFile string) bool {
+	if len(d.md5) == 0 && len(d.sha256) == 0 {
+		// No way to check, always outdated
+		return false
+	}
+
+	if _, err := os.Stat(dstFile); errors.Is(err, os.ErrNotExist) {
+		return false
+	}
+
+	file, err := os.Open(dstFile)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "WARN: Failed to check %s: %v", dstFile, err)
+		return false
+	}
+	defer file.Close()
+
+	bytes, err := ioutil.ReadAll(file)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "WARN: Failed to check %s: %v", dstFile, err)
+		return false
+	}
+
+	return checkMD5(bytes, d.md5) == nil && checkSHA256(bytes, d.sha256) == nil
 }
