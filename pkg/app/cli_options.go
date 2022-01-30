@@ -6,7 +6,12 @@ import (
 	"os"
 )
 
-type Options struct {
+const (
+	defaultConfigName = "check_diff.yaml"
+	defaultVendorDir  = ".check_diff/vendor"
+)
+
+type CliOptions struct {
 	InputFile   string
 	Format      string
 	OutputFile  string
@@ -15,11 +20,11 @@ type Options struct {
 	FailOnError bool
 }
 
-func ParseArgs(args []string) Options {
+func parseArgs(args []string) CliOptions {
 	var outputfile, format, configfile, vendordir, inputFile string
 
 	flagset := flag.NewFlagSet(args[0], flag.ContinueOnError)
-	flagset.StringVarP(&format, "format", "f", "stdout", "Output format. One of: stdout,phabricator,codeclimate,gitlab")
+	flagset.StringVarP(&format, "format", "f", "", "Output format. One of: stdout,phabricator,codeclimate,gitlab")
 	flagset.StringVarP(&outputfile, "output-file", "o", "", "Output file path")
 	flagset.StringVarP(&configfile, "config", "c", defaultConfigName, "Config file path")
 	flagset.StringVarP(&vendordir, "vendor-dir", "", defaultVendorDir, "vendor directory to store intermediate data")
@@ -34,7 +39,7 @@ func ParseArgs(args []string) Options {
 		os.Exit(2)
 	}
 
-	return Options{
+	return CliOptions{
 		InputFile:   inputFile,
 		Format:      format,
 		OutputFile:  outputfile,
@@ -42,4 +47,8 @@ func ParseArgs(args []string) Options {
 		VendorDir:   vendordir,
 		FailOnError: !(*noFailOnError),
 	}
+}
+
+func NewCliOptions() CliOptions {
+	return parseArgs(os.Args)
 }
