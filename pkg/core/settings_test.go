@@ -41,9 +41,9 @@ func (s *SettingsTestSuite) TestMatch() {
 	}
 
 	fixtures := []fixture{
-		{"a/b/c/d", "a/b/**", true},
-		{"a/b/c/d", "a/**/d", true},
-		{"a/b/c/.d", "a/**/.d", true},
+		{"a/b/c/d", "a/b/**", false},
+		{"a/b/c/d", "a/**/d", false},
+		{"a/b/c/.d", "a/**/.d", false},
 	}
 
 	for _, f := range fixtures {
