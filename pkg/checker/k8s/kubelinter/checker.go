@@ -65,6 +65,6 @@ func (linter *KubeLinter) handleDownload(dstPath string) error {
 	return nil
 }
 
-func NewK8KubeLint(settings Settings) core.Checker {
+func NewKubeLint(settings Settings) core.Checker {
 	return &KubeLinter{settings: settings}
 }

@@ -3,13 +3,15 @@ package checkstyle
 import (
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
 	"github.com/iarkhanhelsky/check_diff/pkg/downloader"
+	"go.uber.org/config"
 )
 
 type Settings struct {
-	core.Settings `yaml:"JavaCheckstyle"`
+	core.Settings `yaml:",inline"`
 }
 
 type JavaCheckstyle struct {
+	settings Settings
 }
 
 func (j JavaCheckstyle) Downloads() []downloader.Interface {
@@ -28,3 +30,13 @@ func (j JavaCheckstyle) Check(ranges []core.LineRange) ([]core.Issue, error) {
 }
 
 var _ core.Checker = &JavaCheckstyle{}
+
+func ReadSettings(yaml *config.YAML) (Settings, error) {
+	v := Settings{}
+	err := yaml.Get("Checkstyle").Populate(&v)
+	return v, err
+}
+
+func NewCheckstyle(settings Settings) core.Checker {
+	return &JavaCheckstyle{settings: settings}
+}
