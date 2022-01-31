@@ -1,20 +1,17 @@
 package checkstyle
 
 import (
+	"fmt"
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
 	"github.com/iarkhanhelsky/check_diff/pkg/downloader"
 	"go.uber.org/config"
 )
 
-type Settings struct {
+type Checkstyle struct {
 	core.Settings `yaml:",inline"`
 }
 
-type JavaCheckstyle struct {
-	settings Settings
-}
-
-func (j JavaCheckstyle) Downloads() []downloader.Interface {
+func (j Checkstyle) Downloads() []downloader.Interface {
 	return []downloader.Interface{
 		downloader.NewHTTPDownloader(func(path string) error {
 			return nil
@@ -25,18 +22,16 @@ func (j JavaCheckstyle) Downloads() []downloader.Interface {
 	}
 }
 
-func (j JavaCheckstyle) Check(ranges []core.LineRange) ([]core.Issue, error) {
+func (j Checkstyle) Check(ranges []core.LineRange) ([]core.Issue, error) {
 	return []core.Issue{}, nil
 }
 
-var _ core.Checker = &JavaCheckstyle{}
+var _ core.Checker = &Checkstyle{}
 
-func ReadSettings(yaml *config.YAML) (Settings, error) {
-	v := Settings{}
-	err := yaml.Get("Checkstyle").Populate(&v)
-	return v, err
-}
-
-func NewCheckstyle(settings Settings) core.Checker {
-	return &JavaCheckstyle{settings: settings}
+func NewCheckstyle(yaml *config.YAML) (core.Checker, error) {
+	v := Checkstyle{}
+	if err := yaml.Get("Checkstyle").Populate(&v); err != nil {
+		return nil, fmt.Errorf("can't create Checkstyle: %v", err)
+	}
+	return &v, nil
 }

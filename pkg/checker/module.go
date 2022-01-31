@@ -7,6 +7,6 @@ import (
 )
 
 var Module = fx.Options(
-	fx.Provide(kubelinter.ReadSettings, fx.Annotated{Group: "checkers", Target: kubelinter.NewKubeLint}),
-	fx.Provide(checkstyle.ReadSettings, fx.Annotated{Group: "checkers", Target: checkstyle.NewCheckstyle}),
+	fx.Provide(fx.Annotated{Group: "checkers", Target: kubelinter.NewKubeLint}),
+	fx.Provide(fx.Annotated{Group: "checkers", Target: checkstyle.NewCheckstyle}),
 )

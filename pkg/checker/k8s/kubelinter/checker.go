@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
+	"go.uber.org/config"
 	"os"
 	"os/exec"
 	"path"
@@ -13,20 +14,16 @@ import (
 var defaultCliArgs = []string{"lint", "--format", "sarif"}
 
 type KubeLinter struct {
-	kubeLint string
-	settings Settings
+	core.Settings `yaml:",inline"`
+	kubeLint      string
 }
 
 var _ core.Checker = &KubeLinter{}
 
-func (linter *KubeLinter) Setup() {
-
-}
-
 func (linter *KubeLinter) Check(ranges []core.LineRange) ([]core.Issue, error) {
 	args := append(make([]string, 0), defaultCliArgs...)
 
-	matchedRanges := linter.settings.Filter(ranges, ".yaml", ".yml")
+	matchedRanges := linter.Filter(ranges, ".yaml", ".yml")
 	if len(matchedRanges) == 0 {
 		return []core.Issue{}, nil
 	}
@@ -65,6 +62,10 @@ func (linter *KubeLinter) handleDownload(dstPath string) error {
 	return nil
 }
 
-func NewKubeLint(settings Settings) core.Checker {
-	return &KubeLinter{settings: settings}
+func NewKubeLint(yaml *config.YAML) (core.Checker, error) {
+	kubeLinter := KubeLinter{}
+	if err := yaml.Get("KubeLinter").Populate(&kubeLinter); err != nil {
+		return nil, fmt.Errorf("can't create kube-linter: %v", err)
+	}
+	return &kubeLinter, nil
 }
