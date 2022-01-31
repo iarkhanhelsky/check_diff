@@ -1,10 +1,14 @@
-package kubelinter
+package mapper
 
 import (
 	"fmt"
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
 	"github.com/owenrumney/go-sarif/sarif"
 )
+
+func SarifBytesToIssues(bytes []byte) ([]core.Issue, error) {
+	return parseSarif(bytes)
+}
 
 func parseSarif(reportBytes []byte) ([]core.Issue, error) {
 	report, err := sarif.FromBytes(reportBytes)

@@ -1,4 +1,4 @@
-package kubelinter
+package mapper
 
 import (
 	"github.com/owenrumney/go-sarif/sarif"
@@ -9,13 +9,13 @@ import (
 	"testing"
 )
 
-type ReportTestSuite struct {
+type SarifTestSuite struct {
 	suite.Suite
 
 	reportBytes []byte
 }
 
-func (s *ReportTestSuite) SetupTest() {
+func (s *SarifTestSuite) SetupTest() {
 	file, err := os.Open("testdata/sarif_report.json")
 	defer file.Close()
 	assert.NoError(s.T(), err)
@@ -25,7 +25,7 @@ func (s *ReportTestSuite) SetupTest() {
 	s.reportBytes = bytes
 }
 
-func (s *ReportTestSuite) TestExtractLocation() {
+func (s *SarifTestSuite) TestExtractLocation() {
 	assert := assert.New(s.T())
 
 	report, _ := sarif.FromBytes(s.reportBytes)
@@ -37,5 +37,5 @@ func (s *ReportTestSuite) TestExtractLocation() {
 }
 
 func TestReport(t *testing.T) {
-	suite.Run(t, new(ReportTestSuite))
+	suite.Run(t, new(SarifTestSuite))
 }

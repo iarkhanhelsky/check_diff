@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
+	"github.com/iarkhanhelsky/check_diff/pkg/mapper"
 	"go.uber.org/config"
 	"os"
 	"os/exec"
@@ -42,7 +43,7 @@ func (linter *KubeLinter) Check(ranges []core.LineRange) ([]core.Issue, error) {
 		return nil, fmt.Errorf("failed to run kube-lint: %v: %s", err, string(stderr.Bytes()))
 	}
 
-	issues, err := parseSarif(stdout.Bytes())
+	issues, err := mapper.SarifBytesToIssues(stdout.Bytes())
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert issues: %v", err)
 	}
