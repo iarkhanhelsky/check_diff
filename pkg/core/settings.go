@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/danwakefield/fnmatch"
+	fnmatch "github.com/iarkhanhelsky/fnmatch.v2"
 	"strings"
 )
 

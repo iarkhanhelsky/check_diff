@@ -2,8 +2,9 @@ package phabricator
 
 import (
 	"encoding/json"
-	"github.com/iarkhanhelsky/check_diff/pkg/core"
 	"io"
+
+	"github.com/iarkhanhelsky/check_diff/pkg/core"
 )
 
 //   {
