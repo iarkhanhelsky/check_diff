@@ -45,7 +45,7 @@ func (linter *KubeLinter) Check(ranges []core.LineRange) ([]core.Issue, error) {
 
 	issues, err := mapper.SarifBytesToIssues(stdout.Bytes())
 	if err != nil {
-		return nil, fmt.Errorf("failed to convert issues: %v", err)
+		return nil, fmt.Errorf("failed to convert kube-linter issues: %v", err)
 	}
 	return issues, nil
 }
