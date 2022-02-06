@@ -3,8 +3,7 @@ CheckDiff:
 
 Checkstyle:
   Enabled: true
-  Exclude:
-    - omg.java
+  Config: java/google_checks.xml
 
 KubeLinter:
   Enabled: true
