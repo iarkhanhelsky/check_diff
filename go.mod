@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/fatih/color v1.13.0
-	github.com/iarkhanhelsky/fnmatch.v2 v0.0.0-20220205144727-208d62126cb8
+	github.com/iarkhanhelsky/fnmatch.v2 v0.1.0
 	github.com/owenrumney/go-sarif v1.1.1
 	github.com/saracen/fastzip v0.1.7
 	github.com/spf13/pflag v1.0.5
