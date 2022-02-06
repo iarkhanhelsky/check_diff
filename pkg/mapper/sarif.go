@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
 	"github.com/owenrumney/go-sarif/sarif"
+	"os"
+	"path"
+	"strings"
 )
 
 func SarifBytesToIssues(bytes []byte) ([]core.Issue, error) {
@@ -48,6 +51,10 @@ func extractLocation(locations []*sarif.Location) (string, int, int) {
 
 	if location.ArtifactLocation.URI != nil {
 		file = *location.ArtifactLocation.URI
+		dir, err := os.Getwd()
+		if path.IsAbs(file) && err == nil && strings.HasPrefix(file, dir) {
+			file = file[len(dir)+1:]
+		}
 	}
 
 	if location.Region.StartLine != nil {
