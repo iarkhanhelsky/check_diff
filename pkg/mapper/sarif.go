@@ -54,7 +54,7 @@ func extractLocation(locations []*sarif.Location) (string, int, int) {
 		line = *location.Region.StartLine
 	}
 
-	if location.Region.EndLine != nil {
+	if location.Region.StartColumn != nil {
 		column = *location.Region.StartColumn
 	}
 

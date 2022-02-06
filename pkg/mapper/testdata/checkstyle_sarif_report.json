@@ -1,0 +1,144 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "downloadUri": "https://github.com/checkstyle/checkstyle/releases/",
+          "fullName": "Checkstyle",
+          "informationUri": "https://checkstyle.org/",
+          "language": "en",
+          "name": "Checkstyle",
+          "organization": "Checkstyle",
+          "rules": [
+          ],
+          "semanticVersion": "9.3",
+          "version": "9.3"
+        }
+      },
+      "results": [
+        {
+          "level": "warning",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "/Users/dm/Projects/github/check_diff/example/java/src/main/java/Main.java"
+                },
+                "region": {
+                  "startColumn": 1,
+                  "startLine": 1
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "Missing a Javadoc comment."
+          },
+          "ruleId": "javadoc.missing"
+        },
+        {
+          "level": "warning",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "/Users/dm/Projects/github/check_diff/example/java/src/main/java/Main.java"
+                },
+                "region": {
+                  "startColumn": 1,
+                  "startLine": 2
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "'class def lcurly' has incorrect indentation level 0, expected level should be 2."
+          },
+          "ruleId": "indentation.error"
+        },
+        {
+          "level": "warning",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "/Users/dm/Projects/github/check_diff/example/java/src/main/java/Main.java"
+                },
+                "region": {
+                  "startColumn": 1,
+                  "startLine": 2
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "'{' at column 1 should be on the previous line."
+          },
+          "ruleId": "line.previous"
+        },
+        {
+          "level": "warning",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "/Users/dm/Projects/github/check_diff/example/java/src/main/java/Main.java"
+                },
+                "region": {
+                  "startColumn": 5,
+                  "startLine": 4
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "'{' at column 5 should be on the previous line."
+          },
+          "ruleId": "line.previous"
+        },
+        {
+          "level": "warning",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "/Users/dm/Projects/github/check_diff/example/java/src/main/java/Main.java"
+                },
+                "region": {
+                  "startColumn": 9,
+                  "startLine": 5
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "'method def' child has incorrect indentation level 8, expected level should be 6."
+          },
+          "ruleId": "indentation.child.error"
+        },
+        {
+          "level": "warning",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "/Users/dm/Projects/github/check_diff/example/java/src/main/java/Main.java"
+                },
+                "region": {
+                  "startColumn": 1,
+                  "startLine": 7
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "'class def rcurly' has incorrect indentation level 0, expected level should be 2."
+          },
+          "ruleId": "indentation.error"
+        }
+      ]
+    }
+  ]
+}

@@ -1,39 +1,61 @@
 package mapper
 
 import (
+	"fmt"
 	"github.com/owenrumney/go-sarif/sarif"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"io/ioutil"
-	"os"
+	"path"
 	"testing"
 )
 
 type SarifTestSuite struct {
 	suite.Suite
-
-	reportBytes []byte
 }
 
-func (s *SarifTestSuite) SetupTest() {
-	file, err := os.Open("testdata/sarif_report.json")
-	defer file.Close()
+func (s *SarifTestSuite) getBytes(file string) []byte {
+	bytes, err := ioutil.ReadFile(file)
 	assert.NoError(s.T(), err)
-	bytes, err := ioutil.ReadAll(file)
-	assert.NoError(s.T(), err)
-
-	s.reportBytes = bytes
+	return bytes
 }
 
 func (s *SarifTestSuite) TestExtractLocation() {
-	assert := assert.New(s.T())
+	assert := s.Assert()
 
-	report, _ := sarif.FromBytes(s.reportBytes)
+	type testCase struct {
+		report string
+		run    int
+		result int
+		// expectations
+		line   int
+		column int
+		file   string
+	}
 
-	file, line, column := extractLocation(report.Runs[0].Results[0].Locations)
-	assert.Equal("k8s/deployment.yaml", file)
-	assert.Equal(1, line)
-	assert.Equal(0, column)
+	testcases := []testCase{
+		{
+			report: "kube_linter_sarif_report.json", run: 0,
+			line: 1, column: 0, file: "k8s/deployment.yaml",
+		},
+		{
+			report: "checkstyle_sarif_report.json", run: 0, result: 3,
+			line: 4, column: 5, file: "/Users/dm/Projects/github/check_diff/example/java/src/main/java/Main.java",
+		},
+	}
+
+	for _, tc := range testcases {
+		name := fmt.Sprintf("%s-%d-%d", tc.report, tc.run, tc.result)
+		s.T().Run(name, func(t *testing.T) {
+			report, _ := sarif.FromBytes(s.getBytes(path.Join("testdata", tc.report)))
+
+			file, line, column := extractLocation(report.Runs[tc.run].Results[tc.result].Locations)
+
+			assert.Equal(tc.file, file)
+			assert.Equal(tc.line, line)
+			assert.Equal(tc.column, column)
+		})
+	}
 }
 
 func TestReport(t *testing.T) {
