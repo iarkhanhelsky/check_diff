@@ -35,7 +35,14 @@ func (formatter *Formatter) Print(issues []core.Issue, w io.Writer) error {
 	}
 
 	for _, issue := range issues {
-		formatter.writer.color(color.FgWhite, color.Bold).printf("%s:%d\n", issue.File, issue.Line).reset()
+		formatter.writer.color(color.FgWhite, color.Bold)
+		if issue.Column == 0 {
+			formatter.writer.printf("%s:%d\n", issue.File, issue.Line)
+		} else {
+			formatter.writer.printf("%s:%d:%d\n", issue.File, issue.Line, issue.Column)
+		}
+		formatter.writer.reset()
+
 		formatter.writer.color(color.FgHiMagenta, color.Bold).printf("[%s] %s\n", issue.Severity, issue.Message).reset()
 		formatter.fileBanner(issue)
 		formatter.writer.printf("\n")
@@ -55,7 +62,7 @@ func (formatter *Formatter) fileBanner(issue core.Issue) {
 
 	margin := int(math.Ceil(math.Log10(float64(offset + len(contextLines)))))
 	for i, line := range contextLines {
-		l := offset + i + 1
+		l := issue.Line - offset + i
 		w := formatter.writer.color(color.FgWhite)
 		if l == issue.Line {
 			w = formatter.writer.color(color.Bold, color.BgMagenta)
@@ -69,7 +76,7 @@ func (formatter *Formatter) fileBanner(issue core.Issue) {
 		w = w.printf(" %s\n", line).reset()
 
 		if l == issue.Line {
-			w.color(color.FgWhite, color.Bold).printf(rjust("", ' ', margin+2+issue.Column) + "^\n")
+			w.color(color.FgWhite, color.Bold).printf(rjust("", ' ', margin+1+issue.Column) + "^\n")
 		}
 	}
 }
