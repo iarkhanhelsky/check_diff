@@ -45,9 +45,11 @@ func (reader *fileReader) readContext(path string, line int) ([]string, int, err
 	endLine := line + reader.defaultOffset
 	lines := make([]string, endLine-startLine+1)
 
+	sz := 0
 	for scanner.Scan() {
 		if startLine <= currentLine && currentLine <= endLine {
 			lines[currentLine-startLine] = scanner.Text()
+			sz++
 		}
 		if currentLine == endLine {
 			break
@@ -56,7 +58,7 @@ func (reader *fileReader) readContext(path string, line int) ([]string, int, err
 	}
 
 	reader.line = currentLine
-	return lines, line - startLine, scanner.Err()
+	return lines[:sz], line - startLine, scanner.Err()
 }
 
 func (reader *fileReader) prepareScanner(path string, line int) (*bufio.Scanner, error) {
