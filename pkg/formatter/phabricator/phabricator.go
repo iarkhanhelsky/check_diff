@@ -14,13 +14,13 @@ import (
 //    	"description": "Line is not a Haiku"
 //   }
 type issue struct {
-	name        string `json:"name"`
-	code        string `json:"code"`
-	severity    string `json:"severity"`
-	path        string `json:"path"`
-	description string `json:"description"`
-	line        int    `json:"line"`
-	char        int    `json:"char"`
+	Name        string `json:"name"`
+	Code        string `json:"code"`
+	Severity    string `json:"severity"`
+	Path        string `json:"path"`
+	Description string `json:"description"`
+	Line        int    `json:"line"`
+	Char        int    `json:"char"`
 }
 
 type Formatter struct{}
@@ -50,13 +50,13 @@ func (*Formatter) Print(issues []core.Issue, w io.Writer) error {
 
 func convert(iss core.Issue) issue {
 	return issue{
-		name:        iss.Tag,
-		code:        iss.Source,
-		path:        iss.File,
-		line:        iss.Line,
-		char:        iss.Column,
-		severity:    mapSeverity(iss.Severity),
-		description: iss.Message,
+		Name:        iss.Tag,
+		Code:        iss.Source,
+		Path:        iss.File,
+		Line:        iss.Line,
+		Char:        iss.Column,
+		Severity:    mapSeverity(iss.Severity),
+		Description: iss.Message,
 	}
 }
 
