@@ -30,19 +30,19 @@ import (
 type Formatter struct{}
 
 type issue struct {
-	description string   `json:"description"`
-	fingerprint string   `json:"fingerprint"`
-	severity    string   `json:"severity"`
-	location    location `json:"location"`
+	Description string   `json:"description"`
+	Fingerprint string   `json:"fingerprint"`
+	Severity    string   `json:"severity"`
+	Location    location `json:"location"`
 }
 
 type location struct {
-	path  string `json:"path"`
-	lines lines  `json:"lines"`
+	Path  string `json:"path"`
+	Lines lines  `json:"lines"`
 }
 
 type lines struct {
-	begin int `json:"begin"`
+	Begin int `json:"begin"`
 }
 
 var _ core.Formatter = &Formatter{}
@@ -69,13 +69,13 @@ func (cc *Formatter) Print(issues []core.Issue, w io.Writer) error {
 
 func convert(iss core.Issue) issue {
 	return issue{
-		description: iss.Message,
-		fingerprint: computeFingerprint(iss),
-		severity:    mapSeverity(iss.Severity),
-		location: location{
-			path: iss.File,
-			lines: lines{
-				begin: iss.Line,
+		Description: iss.Message,
+		Fingerprint: computeFingerprint(iss),
+		Severity:    mapSeverity(iss.Severity),
+		Location: location{
+			Path: iss.File,
+			Lines: lines{
+				Begin: iss.Line,
 			},
 		},
 	}

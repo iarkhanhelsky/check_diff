@@ -22,6 +22,8 @@ func NewFormatter(opts Options) (core.Formatter, error) {
 		return stdout.NewFormatter(), nil
 	case "gitlab":
 		return &codeclimate.Formatter{}, nil
+	case "codeclimate":
+		return &codeclimate.Formatter{}, nil
 	case "phabricator":
 		return &phabricator.Formatter{}, nil
 	}
