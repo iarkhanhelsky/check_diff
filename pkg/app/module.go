@@ -26,6 +26,10 @@ func NewFormatterOptions(config core.Config) formatter.Options {
 
 func NewConfig(cliOpts CliOptions, yaml *config.YAML) (core.Config, error) {
 	cfg := core.NewDefaultConfig()
+	err := yaml.Get("CheckDiff").Populate(&cfg)
+	if err != nil {
+		err = fmt.Errorf("can't parse application cfg: %v", err)
+	}
 	if len(cliOpts.VendorDir) != 0 {
 		cfg.VendorDir = cliOpts.VendorDir
 	}
@@ -34,10 +38,6 @@ func NewConfig(cliOpts CliOptions, yaml *config.YAML) (core.Config, error) {
 	}
 	if len(cliOpts.Format) != 0 {
 		cfg.OutputFormat = cliOpts.Format
-	}
-	err := yaml.Get("CheckDiff").Populate(&cfg)
-	if err != nil {
-		err = fmt.Errorf("can't parse application cfg: %v", err)
 	}
 	return cfg, err
 }
