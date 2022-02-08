@@ -7,3 +7,6 @@ Checkstyle:
 
 KubeLinter:
   Enabled: true
+
+Rubocop:
+  Enabled: true
