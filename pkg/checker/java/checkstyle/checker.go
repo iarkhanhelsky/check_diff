@@ -52,9 +52,22 @@ func (j *Checkstyle) Check(ranges []core.LineRange) ([]core.Issue, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert checkstyle issues: %v", err)
 	}
-	return issues, nil
 
-	return []core.Issue{}, nil
+	sz := 0
+	for _, issue := range issues {
+		matched := false
+		for _, r := range ranges {
+			if r.File == issue.File && r.Start <= issue.Line && issue.Line <= r.End {
+				matched = true
+				break
+			}
+		}
+		if matched {
+			issues[sz] = issue
+			sz++
+		}
+	}
+	return issues[:sz], nil
 }
 
 func (j *Checkstyle) handleDownload(p string) error {
