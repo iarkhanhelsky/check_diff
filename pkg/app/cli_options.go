@@ -20,7 +20,7 @@ type CliOptions struct {
 	FailOnError bool
 	// Trace is not really used, but we generate flag for help entry
 	// --trace is checked in NewLogger function, as CliOptions can't be provided
-	// before Logger. 
+	// before Logger.
 	Trace bool
 }
 
