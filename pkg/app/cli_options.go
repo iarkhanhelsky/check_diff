@@ -18,6 +18,10 @@ type CliOptions struct {
 	ConfigFile  string
 	VendorDir   string
 	FailOnError bool
+	// Trace is not really used, but we generate flag for help entry
+	// --trace is checked in NewLogger function, as CliOptions can't be provided
+	// before Logger. 
+	Trace bool
 }
 
 func parseArgs(args []string) CliOptions {
@@ -29,11 +33,12 @@ func parseArgs(args []string) CliOptions {
 	flagset.StringVarP(&configfile, "config", "c", defaultConfigName, "Config file path")
 	flagset.StringVarP(&vendordir, "vendor-dir", "", defaultVendorDir, "vendor directory to store intermediate data")
 	flagset.StringVarP(&inputFile, "input", "i", "", "Input file. Read from STDIN if not set")
-	noFailOnError := flag.BoolP("no-fail", "", false, "")
+	noFailOnError := flagset.BoolP("no-fail", "", false, "")
+	trace := flagset.BoolP("trace", "", false, "Enable debug logs")
 
 	err := flagset.Parse(args[1:])
 	if err == flag.ErrHelp {
-
+		os.Exit(0)
 	} else if err != nil {
 		fmt.Printf("error: %v\n", err)
 		os.Exit(2)
@@ -46,6 +51,7 @@ func parseArgs(args []string) CliOptions {
 		ConfigFile:  configfile,
 		VendorDir:   vendordir,
 		FailOnError: !(*noFailOnError),
+		Trace:       *trace,
 	}
 }
 

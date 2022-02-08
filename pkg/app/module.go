@@ -3,13 +3,19 @@ package app
 import (
 	"fmt"
 	"github.com/iarkhanhelsky/check_diff/pkg/app/command"
+	"github.com/iarkhanhelsky/check_diff/pkg/checker"
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
 	"github.com/iarkhanhelsky/check_diff/pkg/formatter"
 	"go.uber.org/config"
 	"go.uber.org/fx"
+	"go.uber.org/fx/fxevent"
+	"os"
 )
 
 var Module = fx.Options(
+	checker.Module,
+	formatter.Module,
+	fx.WithLogger(NewLogger),
 	fx.Provide(
 		NewCliOptions,
 		NewConfig,
@@ -40,4 +46,19 @@ func NewConfig(cliOpts CliOptions, yaml *config.YAML) (core.Config, error) {
 		cfg.OutputFormat = cliOpts.Format
 	}
 	return cfg, err
+}
+
+func NewLogger() fxevent.Logger {
+	trace := false
+	for _, arg := range os.Args {
+		if arg == "--trace" {
+			trace = true
+			break
+		}
+	}
+	if trace {
+		return &fxevent.ConsoleLogger{W: os.Stderr}
+	}
+
+	return fxevent.NopLogger
 }
