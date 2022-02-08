@@ -1,12 +1,11 @@
 package app
 
 import (
+	"bufio"
 	"fmt"
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
 	"io"
-	"io/ioutil"
 	"os"
-	"strings"
 )
 
 func NewDiff(cliOptions CliOptions) ([]core.LineRange, error) {
@@ -21,10 +20,10 @@ func NewDiff(cliOptions CliOptions) ([]core.LineRange, error) {
 		defer file.Close()
 		reader = file
 	}
-	diff, _ := ioutil.ReadAll(reader)
+
 	parser := core.NewDiffParser()
-	for _, line := range strings.Split(string(diff), "\n") {
-		parser.ParseNextLine(line)
+	for scanner := bufio.NewScanner(reader); scanner.Scan(); {
+		parser.ParseNextLine(scanner.Text())
 	}
 
 	return parser.Result(), nil
