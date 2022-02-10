@@ -72,7 +72,7 @@ func (check *Check) runChecks() error {
 	if len(outFile) == 0 {
 		writer = os.Stdout
 	} else {
-		file, err := os.Open(outFile)
+		file, err := os.Create(outFile)
 		defer file.Close()
 		if err != nil {
 			return fmt.Errorf("can't open output file: %s: %v", outFile, err)
