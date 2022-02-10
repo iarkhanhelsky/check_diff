@@ -54,8 +54,7 @@ type flow struct {
 var _ Flow = &flow{}
 
 func (f *flow) Run(ranges []LineRange) ([]Issue, error) {
-
-	matchedRanges := f.settings.Filter(ranges, ".rb", ".erb", "Rakefile", ".rake")
+	matchedRanges := f.settings.Filter(ranges, f.supportedExtensions...)
 	if len(matchedRanges) == 0 {
 		return []Issue{}, nil
 	}

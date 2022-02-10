@@ -1,14 +1,12 @@
 package kubelinter
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
 	"github.com/iarkhanhelsky/check_diff/pkg/mapper"
 	"go.uber.org/config"
 	"os"
-	"os/exec"
 	"path"
 )
 
@@ -22,32 +20,11 @@ type KubeLinter struct {
 var _ core.Checker = &KubeLinter{}
 
 func (linter *KubeLinter) Check(ranges []core.LineRange) ([]core.Issue, error) {
-	args := append(make([]string, 0), defaultCliArgs...)
-
-	matchedRanges := linter.Filter(ranges, ".yaml", ".yml")
-	if len(matchedRanges) == 0 {
-		return []core.Issue{}, nil
-	}
-	for _, r := range matchedRanges {
-		args = append(args, r.File)
-	}
-
-	cmd := exec.Command(linter.kubeLint, args...)
-
-	var stdout, stderr bytes.Buffer
-
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-
-	if err := cmd.Run(); err != nil && cmd.ProcessState.ExitCode() != 1 {
-		return nil, fmt.Errorf("failed to run kube-lint: %v: %s", err, string(stderr.Bytes()))
-	}
-
-	issues, err := mapper.SarifBytesToIssues(stdout.Bytes())
-	if err != nil {
-		return nil, fmt.Errorf("failed to convert kube-linter issues: %v", err)
-	}
-	return issues, nil
+	return core.NewFlow("kube-linter", linter.Settings,
+		core.WithCommand(linter.kubeLint, defaultCliArgs...),
+		core.WithFileExtensions(".yaml", ".yml"),
+		core.WithConverter(mapper.SarifBytesToIssues),
+	).Run(ranges)
 }
 
 func (linter *KubeLinter) handleDownload(dstPath string) error {
