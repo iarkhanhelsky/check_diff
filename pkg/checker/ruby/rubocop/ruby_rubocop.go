@@ -1,13 +1,11 @@
 package rubocop
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
 	"github.com/iarkhanhelsky/check_diff/pkg/downloader"
 	"go.uber.org/config"
-	"os/exec"
 )
 
 type report struct {
@@ -66,57 +64,22 @@ func (r Rubocop) Downloads() []downloader.Interface {
 }
 
 func (r Rubocop) Check(ranges []core.LineRange) ([]core.Issue, error) {
-	args := []string{"-f", "json"}
-
-	matchedRanges := r.Filter(ranges, ".rb", ".erb", "Rakefile", ".rake")
-	if len(matchedRanges) == 0 {
-		return []core.Issue{}, nil
-	}
-
-	if len(r.Config) != 0 {
-		args = append(args, "-c", r.Config)
-	}
-
-	for _, r := range matchedRanges {
-		args = append(args, r.File)
-	}
-
 	command := r.Command
 	if len(command) == 0 {
 		command = "rubocop"
 	}
 
-	cmd := exec.Command(command, args...)
+	args := []string{"-f", "json"}
 
-	var stdout, stderr bytes.Buffer
-
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-
-	if err := cmd.Run(); err != nil && cmd.ProcessState.ExitCode() != 1 {
-		return nil, fmt.Errorf("failed to run rubocop: %v: %s", err, string(stderr.Bytes()))
+	if len(r.Config) != 0 {
+		args = append(args, "-c", r.Config)
 	}
 
-	issues, err := parseReport(stdout.Bytes())
-	if err != nil {
-		return nil, fmt.Errorf("failed to convert rubocop issues: %v", err)
-	}
-
-	sz := 0
-	for _, issue := range issues {
-		matched := false
-		for _, r := range ranges {
-			if r.File == issue.File && r.Start <= issue.Line && issue.Line <= r.End {
-				matched = true
-				break
-			}
-		}
-		if matched {
-			issues[sz] = issue
-			sz++
-		}
-	}
-	return issues[:sz], nil
+	return core.NewFlow("rubocop", r.Settings,
+		core.WithCommand(command, args...),
+		core.WithFileExtensions(".rb", ".erb", "Rakefile", ".rake"),
+		core.WithConverter(parseReport),
+	).Run(ranges)
 }
 
 func parseReport(bytes []byte) ([]core.Issue, error) {
