@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	"github.com/fatih/color"
 	"github.com/iarkhanhelsky/check_diff/pkg/app/command"
 	"github.com/iarkhanhelsky/check_diff/pkg/checker"
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
@@ -24,6 +25,9 @@ var Module = fx.Options(
 		NewFormatterOptions,
 		command.NewCheck,
 	),
+	fx.Invoke(func(opts CliOptions) {
+		color.NoColor = opts.NoColor
+	}),
 )
 
 func NewFormatterOptions(config core.Config) formatter.Options {

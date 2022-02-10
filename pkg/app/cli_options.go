@@ -18,11 +18,12 @@ type CliOptions struct {
 	ConfigFile  string
 	VendorDir   string
 	FailOnError bool
+	Version     bool
+	NoColor     bool
 	// Trace is not really used, but we generate flag for help entry
 	// --trace is checked in NewLogger function, as CliOptions can't be provided
 	// before Logger.
-	Trace   bool
-	Version bool
+	Trace bool
 }
 
 func parseArgs(args []string) CliOptions {
@@ -36,6 +37,7 @@ func parseArgs(args []string) CliOptions {
 	flagset.StringVarP(&inputFile, "input", "i", "", "Input file. Read from STDIN if not set")
 	noFailOnError := flagset.BoolP("no-fail", "", false, "")
 	trace := flagset.BoolP("trace", "", false, "Enable debug logs")
+	noColor := flagset.BoolP("no-color", "", false, "Disable colors")
 	version := flagset.BoolP("version", "", false, "Print version and exit")
 
 	err := flagset.Parse(args[1:])
@@ -56,6 +58,7 @@ func parseArgs(args []string) CliOptions {
 		ConfigFile:  configfile,
 		VendorDir:   vendordir,
 		FailOnError: !(*noFailOnError),
+		NoColor:     *noColor,
 		Trace:       *trace,
 	}
 }
