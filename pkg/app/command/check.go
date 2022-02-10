@@ -46,10 +46,14 @@ func (check *Check) Run() error {
 }
 
 func (check *Check) download() error {
+	err := os.MkdirAll(check.Config.VendorDir, 0755)
+	if err != nil {
+		return err
+	}
 	for _, checker := range check.Checkers {
 		for _, download := range checker.Downloads() {
 			if err := download.Download(check.Config.VendorDir); err != nil {
-				panic(err)
+				return err
 			}
 		}
 	}
