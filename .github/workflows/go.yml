@@ -25,8 +25,8 @@ jobs:
     - name: Set up tools
       run: sudo apt-get install jq
 
-    - name: Set up linters
-      run: gem install rubocop@1.25.1
+    - name: Set up gems
+      run: cd example && bundle install
 
     - name: Build
       run: make build

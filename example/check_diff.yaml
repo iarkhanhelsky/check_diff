@@ -10,3 +10,4 @@ KubeLinter:
 
 Rubocop:
   Enabled: true
+  Command: bin/rubocop
