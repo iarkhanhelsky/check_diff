@@ -1,0 +1,171 @@
+ruby/main.rb:1:1
+[convention] Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+1: def fibonacci( n )
+   ^
+2:     [ n ] if ( 0..1 ).include? n
+3:     ( fibonacci( n - 1 ) + fibonacci( n - 2 ) ) if n > 1
+4: end
+5: 
+6: puts fibonacci( 5 )
+
+ruby/main.rb:1:15
+[convention] Layout/SpaceInsideParens: Space inside parentheses detected.
+1: def fibonacci( n )
+                 ^
+2:     [ n ] if ( 0..1 ).include? n
+3:     ( fibonacci( n - 1 ) + fibonacci( n - 2 ) ) if n > 1
+4: end
+5: 
+6: puts fibonacci( 5 )
+
+ruby/main.rb:1:16
+[convention] Naming/MethodParameterName: Method parameter must be at least 3 characters long.
+1: def fibonacci( n )
+                  ^
+2:     [ n ] if ( 0..1 ).include? n
+3:     ( fibonacci( n - 1 ) + fibonacci( n - 2 ) ) if n > 1
+4: end
+5: 
+6: puts fibonacci( 5 )
+
+ruby/main.rb:1:17
+[convention] Layout/SpaceInsideParens: Space inside parentheses detected.
+1: def fibonacci( n )
+                   ^
+2:     [ n ] if ( 0..1 ).include? n
+3:     ( fibonacci( n - 1 ) + fibonacci( n - 2 ) ) if n > 1
+4: end
+5: 
+6: puts fibonacci( 5 )
+
+ruby/main.rb:2:1
+[convention] Layout/IndentationWidth: Use 2 (not 4) spaces for indentation.
+1: def fibonacci( n )
+2:     [ n ] if ( 0..1 ).include? n
+   ^
+3:     ( fibonacci( n - 1 ) + fibonacci( n - 2 ) ) if n > 1
+4: end
+5: 
+6: puts fibonacci( 5 )
+
+ruby/main.rb:2:6
+[convention] Layout/SpaceInsideArrayLiteralBrackets: Do not use space inside array brackets.
+1: def fibonacci( n )
+2:     [ n ] if ( 0..1 ).include? n
+        ^
+3:     ( fibonacci( n - 1 ) + fibonacci( n - 2 ) ) if n > 1
+4: end
+5: 
+6: puts fibonacci( 5 )
+
+ruby/main.rb:2:8
+[convention] Layout/SpaceInsideArrayLiteralBrackets: Do not use space inside array brackets.
+1: def fibonacci( n )
+2:     [ n ] if ( 0..1 ).include? n
+          ^
+3:     ( fibonacci( n - 1 ) + fibonacci( n - 2 ) ) if n > 1
+4: end
+5: 
+6: puts fibonacci( 5 )
+
+ruby/main.rb:2:15
+[convention] Layout/SpaceInsideParens: Space inside parentheses detected.
+1: def fibonacci( n )
+2:     [ n ] if ( 0..1 ).include? n
+                 ^
+3:     ( fibonacci( n - 1 ) + fibonacci( n - 2 ) ) if n > 1
+4: end
+5: 
+6: puts fibonacci( 5 )
+
+ruby/main.rb:2:20
+[convention] Layout/SpaceInsideParens: Space inside parentheses detected.
+1: def fibonacci( n )
+2:     [ n ] if ( 0..1 ).include? n
+                      ^
+3:     ( fibonacci( n - 1 ) + fibonacci( n - 2 ) ) if n > 1
+4: end
+5: 
+6: puts fibonacci( 5 )
+
+ruby/main.rb:3:6
+[convention] Layout/SpaceInsideParens: Space inside parentheses detected.
+1: def fibonacci( n )
+2:     [ n ] if ( 0..1 ).include? n
+3:     ( fibonacci( n - 1 ) + fibonacci( n - 2 ) ) if n > 1
+        ^
+4: end
+5: 
+6: puts fibonacci( 5 )
+
+ruby/main.rb:3:17
+[convention] Layout/SpaceInsideParens: Space inside parentheses detected.
+1: def fibonacci( n )
+2:     [ n ] if ( 0..1 ).include? n
+3:     ( fibonacci( n - 1 ) + fibonacci( n - 2 ) ) if n > 1
+                   ^
+4: end
+5: 
+6: puts fibonacci( 5 )
+
+ruby/main.rb:3:23
+[convention] Layout/SpaceInsideParens: Space inside parentheses detected.
+1: def fibonacci( n )
+2:     [ n ] if ( 0..1 ).include? n
+3:     ( fibonacci( n - 1 ) + fibonacci( n - 2 ) ) if n > 1
+                         ^
+4: end
+5: 
+6: puts fibonacci( 5 )
+
+ruby/main.rb:3:38
+[convention] Layout/SpaceInsideParens: Space inside parentheses detected.
+1: def fibonacci( n )
+2:     [ n ] if ( 0..1 ).include? n
+3:     ( fibonacci( n - 1 ) + fibonacci( n - 2 ) ) if n > 1
+                                        ^
+4: end
+5: 
+6: puts fibonacci( 5 )
+
+ruby/main.rb:3:44
+[convention] Layout/SpaceInsideParens: Space inside parentheses detected.
+1: def fibonacci( n )
+2:     [ n ] if ( 0..1 ).include? n
+3:     ( fibonacci( n - 1 ) + fibonacci( n - 2 ) ) if n > 1
+                                              ^
+4: end
+5: 
+6: puts fibonacci( 5 )
+
+ruby/main.rb:3:46
+[convention] Layout/SpaceInsideParens: Space inside parentheses detected.
+1: def fibonacci( n )
+2:     [ n ] if ( 0..1 ).include? n
+3:     ( fibonacci( n - 1 ) + fibonacci( n - 2 ) ) if n > 1
+                                                ^
+4: end
+5: 
+6: puts fibonacci( 5 )
+
+ruby/main.rb:6:16
+[convention] Layout/SpaceInsideParens: Space inside parentheses detected.
+ 1: def fibonacci( n )
+ 2:     [ n ] if ( 0..1 ).include? n
+ 3:     ( fibonacci( n - 1 ) + fibonacci( n - 2 ) ) if n > 1
+ 4: end
+ 5: 
+ 6: puts fibonacci( 5 )
+                   ^
+
+ruby/main.rb:6:18
+[convention] Layout/SpaceInsideParens: Space inside parentheses detected.
+ 1: def fibonacci( n )
+ 2:     [ n ] if ( 0..1 ).include? n
+ 3:     ( fibonacci( n - 1 ) + fibonacci( n - 2 ) ) if n > 1
+ 4: end
+ 5: 
+ 6: puts fibonacci( 5 )
+                     ^
+
+Total: 17 in 1 files
