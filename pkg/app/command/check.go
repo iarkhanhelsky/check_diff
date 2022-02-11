@@ -38,11 +38,12 @@ func (check *Check) Run() error {
 		return fmt.Errorf("failed to download dependencies: %v", err)
 	}
 
-	if err := check.runChecks(); err != nil {
-		return fmt.Errorf("failed to run one or more checks: %v", err)
+	issues, err := check.runChecks()
+	if err != nil {
+		return err
 	}
 
-	return nil
+	return check.writeIssues(issues)
 }
 
 func (check *Check) download() error {
@@ -61,16 +62,37 @@ func (check *Check) download() error {
 	return nil
 }
 
-func (check *Check) runChecks() error {
+func (check *Check) runChecks() ([]core.Issue, error) {
 	var issues []core.Issue
+
+	issueChan := make(chan []core.Issue)
+	errorChan := make(chan error)
+
 	for _, checker := range check.Checkers {
-		r, err := checker.Check(check.LineRanges)
-		if err != nil {
-			return fmt.Errorf("one or more checkers failed to finish: %v", err)
-		}
-		issues = append(issues, r...)
+		ch := checker
+		go func() {
+			r, err := ch.Check(check.LineRanges)
+			if err != nil {
+				errorChan <- err
+			} else {
+				issueChan <- r
+			}
+		}()
 	}
 
+	for sz := 0; sz < len(check.Checkers); sz++ {
+		select {
+		case i := <-issueChan:
+			issues = append(issues, i...)
+		case e := <-errorChan:
+			return nil, fmt.Errorf("one or more checkers failed: %v", e)
+		}
+	}
+
+	return issues, nil
+}
+
+func (check *Check) writeIssues(issues []core.Issue) error {
 	var writer io.Writer
 	outFile := check.Config.OutputFile
 	if len(outFile) == 0 {
