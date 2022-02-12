@@ -13,6 +13,6 @@ type Config struct {
 
 func NewDefaultConfig() Config {
 	return Config{
-		OutputFormat: string(STDOUT),
+		OutputFormat: "stdout",
 	}
 }

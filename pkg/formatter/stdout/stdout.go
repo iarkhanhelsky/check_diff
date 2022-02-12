@@ -23,10 +23,6 @@ func NewFormatter() core.Formatter {
 	}
 }
 
-func (*Formatter) Supports() []core.Format {
-	return []core.Format{core.STDOUT}
-}
-
 func (formatter *Formatter) Print(issues []core.Issue, w io.Writer) error {
 	formatter.writer = writer{w: w}
 

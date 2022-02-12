@@ -27,10 +27,6 @@ type Formatter struct{}
 
 var _ core.Formatter = &Formatter{}
 
-func (*Formatter) Supports() []core.Format {
-	return []core.Format{core.Phabricator}
-}
-
 func (*Formatter) Print(issues []core.Issue, w io.Writer) error {
 	for _, issue := range issues {
 		i := convert(issue)

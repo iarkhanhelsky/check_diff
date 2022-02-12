@@ -47,11 +47,7 @@ type lines struct {
 
 var _ core.Formatter = &Formatter{}
 
-func (cc *Formatter) Supports() []core.Format {
-	return []core.Format{core.Codeclimate, core.Gitlab}
-}
-
-func (cc *Formatter) Print(issues []core.Issue, w io.Writer) error {
+func (formatter *Formatter) Print(issues []core.Issue, w io.Writer) error {
 	var report []issue
 	for _, issue := range issues {
 		e := convert(issue)
