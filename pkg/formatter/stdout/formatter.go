@@ -18,9 +18,7 @@ type Formatter struct {
 }
 
 func NewFormatter() core.Formatter {
-	return &Formatter{
-		contextReader: newCachedFileContext(5),
-	}
+	return &Formatter{contextReader: newCachedFileContext(5)}
 }
 
 func (formatter *Formatter) Print(issues []core.Issue, w io.Writer) error {
