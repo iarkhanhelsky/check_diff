@@ -51,6 +51,10 @@ type Rubocop struct {
 
 var _ core.Checker = &Rubocop{}
 
+func (checker *Rubocop) Tag() string {
+	return "Rubocop"
+}
+
 func NewRubocop(yaml *config.YAML) (core.Checker, error) {
 	v := Rubocop{}
 	if err := yaml.Get("Rubocop").Populate(&v); err != nil {
@@ -59,23 +63,23 @@ func NewRubocop(yaml *config.YAML) (core.Checker, error) {
 	return &v, nil
 }
 
-func (r Rubocop) Downloads() []downloader.Interface {
+func (checker Rubocop) Downloads() []downloader.Interface {
 	return downloader.Empty
 }
 
-func (r Rubocop) Check(ranges []core.LineRange) ([]core.Issue, error) {
-	command := r.Command
+func (checker Rubocop) Check(ranges []core.LineRange) ([]core.Issue, error) {
+	command := checker.Command
 	if len(command) == 0 {
 		command = "rubocop"
 	}
 
 	args := []string{"-f", "json"}
 
-	if len(r.Config) != 0 {
-		args = append(args, "-c", r.Config)
+	if len(checker.Config) != 0 {
+		args = append(args, "-c", checker.Config)
 	}
 
-	return core.NewFlow("rubocop", r.Settings,
+	return core.NewFlow("rubocop", checker.Settings,
 		core.WithCommand(command, args...),
 		core.WithFileExtensions(".rb", ".erb", "Rakefile", ".rake"),
 		core.WithConverter(parseReport),

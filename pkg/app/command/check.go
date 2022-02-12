@@ -81,12 +81,12 @@ func (check *Check) runChecks() ([]core.Issue, error) {
 			duration := time.Since(start)
 
 			if err != nil {
-				check.Logger.Named("").Errorf("finished with error: %v", err)
+				check.Logger.With("checker", ch.Tag()).Errorf("finished with error: %v", err)
 				errorChan <- err
 			} else {
 				issueChan <- r
 			}
-			check.Logger.Named("").Debugf("took %s", duration)
+			check.Logger.With("checker", ch.Tag()).Debugf("took %s", duration)
 		}()
 	}
 

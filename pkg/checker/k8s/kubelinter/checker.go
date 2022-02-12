@@ -19,15 +19,19 @@ type KubeLinter struct {
 
 var _ core.Checker = &KubeLinter{}
 
-func (linter *KubeLinter) Check(ranges []core.LineRange) ([]core.Issue, error) {
-	return core.NewFlow("kube-linter", linter.Settings,
-		core.WithCommand(linter.kubeLint, defaultCliArgs...),
+func (checker *KubeLinter) Tag() string {
+	return "KubeLinter"
+}
+
+func (checker *KubeLinter) Check(ranges []core.LineRange) ([]core.Issue, error) {
+	return core.NewFlow("kube-linter", checker.Settings,
+		core.WithCommand(checker.kubeLint, defaultCliArgs...),
 		core.WithFileExtensions(".yaml", ".yml"),
 		core.WithConverter(mapper.SarifBytesToIssues),
 	).Run(ranges)
 }
 
-func (linter *KubeLinter) handleDownload(dstPath string) error {
+func (checker *KubeLinter) handleDownload(dstPath string) error {
 	kubelint := path.Join(dstPath, "kube-linter", "kube-linter")
 	if _, err := os.Stat(kubelint); errors.Is(err, os.ErrNotExist) {
 		return err
@@ -36,7 +40,7 @@ func (linter *KubeLinter) handleDownload(dstPath string) error {
 	if err := os.Chmod(kubelint, 0755); err != nil {
 		return err
 	}
-	linter.kubeLint = kubelint
+	checker.kubeLint = kubelint
 	return nil
 }
 
