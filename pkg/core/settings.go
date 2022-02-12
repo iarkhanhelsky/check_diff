@@ -23,6 +23,14 @@ func (settings Settings) Filter(ranges []LineRange, supportedExtensions ...strin
 	return result
 }
 
+func (settings Settings) CommandOrDefault(defaultCommand string) string {
+	if len(settings.Command) == 0 {
+		return defaultCommand
+	}
+
+	return settings.Command
+}
+
 func (settings Settings) isIncluded(r LineRange) bool {
 	if len(settings.Include) == 0 {
 		return true

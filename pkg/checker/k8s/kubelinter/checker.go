@@ -23,7 +23,7 @@ func (checker *Checker) Tag() string {
 
 func (checker *Checker) Check(ranges []core.LineRange) ([]core.Issue, error) {
 	return core.NewFlow("kube-linter", checker.Settings,
-		core.WithCommand(checker.kubeLint, defaultCliArgs...),
+		core.WithCommand(checker.CommandOrDefault(checker.kubeLint), defaultCliArgs...),
 		core.WithFileExtensions(".yaml", ".yml"),
 		core.WithConverter(mapper.SarifBytesToIssues),
 	).Run(ranges)

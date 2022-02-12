@@ -59,11 +59,6 @@ func (checker Checker) Downloads() []downloader.Interface {
 }
 
 func (checker Checker) Check(ranges []core.LineRange) ([]core.Issue, error) {
-	command := checker.Command
-	if len(command) == 0 {
-		command = "rubocop"
-	}
-
 	args := []string{"-f", "json"}
 
 	if len(checker.Config) != 0 {
@@ -71,7 +66,7 @@ func (checker Checker) Check(ranges []core.LineRange) ([]core.Issue, error) {
 	}
 
 	return core.NewFlow("rubocop", checker.Settings,
-		core.WithCommand(command, args...),
+		core.WithCommand(checker.CommandOrDefault("rubocop"), args...),
 		core.WithFileExtensions(".rb", ".erb", "Rakefile", ".rake"),
 		core.WithConverter(parseReport),
 	).Run(ranges)
