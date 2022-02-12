@@ -23,7 +23,7 @@ func NewDiff(params DiffParams) ([]core.LineRange, error) {
 	cliOptions := params.CliOptions
 	logger := params.Logger.Sugar()
 	if len(cliOptions.InputFile) == 0 {
-		logger.Debugf("reading diff from STDOUT")
+		logger.Debugf("reading diff from STDIN")
 		reader = os.Stdin
 	} else {
 		file, err := os.Open(cliOptions.InputFile)
