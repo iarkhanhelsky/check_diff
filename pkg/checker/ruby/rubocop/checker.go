@@ -44,21 +44,21 @@ type location struct {
 	Column int `json:"start_column"`
 }
 
-type Rubocop struct {
+type Checker struct {
 	core.Settings `yaml:",inline"`
 }
 
-var _ core.Checker = &Rubocop{}
+var _ core.Checker = &Checker{}
 
-func (checker *Rubocop) Tag() string {
+func (checker *Checker) Tag() string {
 	return "Rubocop"
 }
 
-func (checker Rubocop) Downloads() []downloader.Interface {
+func (checker Checker) Downloads() []downloader.Interface {
 	return downloader.Empty
 }
 
-func (checker Rubocop) Check(ranges []core.LineRange) ([]core.Issue, error) {
+func (checker Checker) Check(ranges []core.LineRange) ([]core.Issue, error) {
 	command := checker.Command
 	if len(command) == 0 {
 		command = "rubocop"

@@ -4,7 +4,7 @@ import (
 	"github.com/iarkhanhelsky/check_diff/pkg/downloader"
 )
 
-func (checker *KubeLinter) Downloads() []downloader.Interface {
+func (checker *Checker) Downloads() []downloader.Interface {
 	return []downloader.Interface{
 		downloader.NewZipDownloader(checker.handleDownload, "kube-linter",
 			"58b4a9b8d55c1997c866471c14bbcb3a",

@@ -10,18 +10,18 @@ import (
 
 var defaultCliArgs = []string{"lint", "--format", "sarif"}
 
-type KubeLinter struct {
+type Checker struct {
 	core.Settings `yaml:",inline"`
 	kubeLint      string
 }
 
-var _ core.Checker = &KubeLinter{}
+var _ core.Checker = &Checker{}
 
-func (checker *KubeLinter) Tag() string {
+func (checker *Checker) Tag() string {
 	return "KubeLinter"
 }
 
-func (checker *KubeLinter) Check(ranges []core.LineRange) ([]core.Issue, error) {
+func (checker *Checker) Check(ranges []core.LineRange) ([]core.Issue, error) {
 	return core.NewFlow("kube-linter", checker.Settings,
 		core.WithCommand(checker.kubeLint, defaultCliArgs...),
 		core.WithFileExtensions(".yaml", ".yml"),
@@ -29,7 +29,7 @@ func (checker *KubeLinter) Check(ranges []core.LineRange) ([]core.Issue, error) 
 	).Run(ranges)
 }
 
-func (checker *KubeLinter) handleDownload(dstPath string) error {
+func (checker *Checker) handleDownload(dstPath string) error {
 	kubelint := path.Join(dstPath, "kube-linter", "kube-linter")
 	if _, err := os.Stat(kubelint); errors.Is(err, os.ErrNotExist) {
 		return err

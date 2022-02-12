@@ -23,9 +23,9 @@ func defaultProvider(obj core.Checker) provider {
 }
 
 var Module = ProvideCheckers(
-	&kubelinter.KubeLinter{},
-	&checkstyle.Checkstyle{},
-	&rubocop.Rubocop{},
+	&kubelinter.Checker{},
+	&checkstyle.Checker{},
+	&rubocop.Checker{},
 )
 
 func ProvideCheckers(checkers ...core.Checker) fx.Option {

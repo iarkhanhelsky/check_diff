@@ -7,17 +7,17 @@ import (
 	"path"
 )
 
-type Checkstyle struct {
+type Checker struct {
 	core.Settings `yaml:",inline"`
 
 	checkstyle string
 }
 
-func (checker *Checkstyle) Tag() string {
+func (checker *Checker) Tag() string {
 	return "Checkstyle"
 }
 
-func (checker *Checkstyle) Check(ranges []core.LineRange) ([]core.Issue, error) {
+func (checker *Checker) Check(ranges []core.LineRange) ([]core.Issue, error) {
 	// java -jar .check_diff/vendor/checkstyle-all.jar \
 	//  -c java/google_checks.xml \
 	//  -f sarif \
@@ -30,7 +30,7 @@ func (checker *Checkstyle) Check(ranges []core.LineRange) ([]core.Issue, error) 
 	).Run(ranges)
 }
 
-func (checker *Checkstyle) Downloads() []downloader.Interface {
+func (checker *Checker) Downloads() []downloader.Interface {
 	return []downloader.Interface{
 		downloader.NewHTTPDownloader(checker.handleDownload, "checkstyle-all.jar",
 			"970092a4271e5388b13055db1df485dd",
@@ -39,9 +39,9 @@ func (checker *Checkstyle) Downloads() []downloader.Interface {
 	}
 }
 
-func (checker *Checkstyle) handleDownload(p string) error {
+func (checker *Checker) handleDownload(p string) error {
 	checker.checkstyle = path.Join(p, "checkstyle-all.jar")
 	return nil
 }
 
-var _ core.Checker = &Checkstyle{}
+var _ core.Checker = &Checker{}
