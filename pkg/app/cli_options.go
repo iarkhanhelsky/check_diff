@@ -2,8 +2,10 @@ package app
 
 import (
 	"fmt"
+	"github.com/iarkhanhelsky/check_diff/pkg/formatter"
 	flag "github.com/spf13/pflag"
 	"os"
+	"strings"
 )
 
 const (
@@ -30,7 +32,7 @@ func parseArgs(args []string) CliOptions {
 	var outputfile, format, configfile, vendordir, inputFile string
 
 	flagset := flag.NewFlagSet(args[0], flag.ContinueOnError)
-	flagset.StringVarP(&format, "format", "f", "", "Output format. One of: stdout,phabricator,codeclimate,gitlab")
+	flagset.StringVarP(&format, "format", "f", "", "Output format. One of: "+strings.Join(formatter.FormatNames(), ", "))
 	flagset.StringVarP(&outputfile, "output-file", "o", "", "Output file path")
 	flagset.StringVarP(&configfile, "config", "c", defaultConfigName, "Config file path")
 	flagset.StringVarP(&vendordir, "vendor-dir", "", defaultVendorDir, "vendor directory to store intermediate data")

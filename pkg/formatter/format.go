@@ -35,3 +35,16 @@ func (format Format) Formatter() (core.Formatter, error) {
 
 	return nil, fmt.Errorf("unknown formatter type: '%s'", format)
 }
+
+func Formats() []Format {
+	return []Format{STDOUT, Codeclimate, Gitlab, Phabricator}
+}
+
+func FormatNames() []string {
+	formats := Formats()
+	var list = make([]string, len(formats))
+	for i, f := range formats {
+		list[i] = string(f)
+	}
+	return list
+}
