@@ -10,19 +10,19 @@ import (
 	"go.uber.org/config"
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxevent"
-	"os"
 )
 
 var Module = fx.Options(
 	checker.Module,
 	formatter.Module,
-	fx.WithLogger(NewLogger),
+	fx.WithLogger(func() fxevent.Logger { return fxevent.NopLogger }),
 	fx.Provide(
 		NewCliOptions,
 		NewConfig,
 		NewYaml,
 		NewDiff,
 		NewFormatterOptions,
+		NewLogger,
 		command.NewCheck,
 	),
 	fx.Invoke(func(opts CliOptions) {
@@ -50,19 +50,4 @@ func NewConfig(cliOpts CliOptions, yaml *config.YAML) (core.Config, error) {
 		cfg.OutputFormat = cliOpts.Format
 	}
 	return cfg, err
-}
-
-func NewLogger() fxevent.Logger {
-	trace := false
-	for _, arg := range os.Args {
-		if arg == "--trace" {
-			trace = true
-			break
-		}
-	}
-	if trace {
-		return &fxevent.ConsoleLogger{W: os.Stderr}
-	}
-
-	return fxevent.NopLogger
 }

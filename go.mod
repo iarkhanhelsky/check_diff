@@ -12,6 +12,7 @@ require (
 	go.uber.org/config v1.4.0
 	go.uber.org/fx v1.16.0
 	gopkg.in/yaml.v2 v2.4.0
+	go.uber.org/zap v1.16.0
 )
 
 require (

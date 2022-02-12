@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
 	"go.uber.org/fx"
+	"go.uber.org/zap"
 	"io"
 	"os"
+	"time"
 )
 
 type Params struct {
@@ -15,6 +17,7 @@ type Params struct {
 	Checkers   []core.Checker `group:"checkers"`
 	Formatter  core.Formatter
 	Config     core.Config
+	Logger     *zap.Logger
 }
 
 type Check struct {
@@ -22,6 +25,7 @@ type Check struct {
 	Checkers   []core.Checker
 	Formatter  core.Formatter
 	Config     core.Config
+	Logger     *zap.SugaredLogger
 }
 
 func NewCheck(params Params) Check {
@@ -30,6 +34,7 @@ func NewCheck(params Params) Check {
 		Checkers:   params.Checkers,
 		Formatter:  params.Formatter,
 		Config:     params.Config,
+		Logger:     params.Logger.Sugar(),
 	}
 }
 
@@ -71,12 +76,17 @@ func (check *Check) runChecks() ([]core.Issue, error) {
 	for _, checker := range check.Checkers {
 		ch := checker
 		go func() {
+			start := time.Now()
 			r, err := ch.Check(check.LineRanges)
+			duration := time.Since(start)
+
 			if err != nil {
+				check.Logger.Named("").Errorf("finished with error: %v", err)
 				errorChan <- err
 			} else {
 				issueChan <- r
 			}
+			check.Logger.Named("").Debugf("took %s", duration)
 		}()
 	}
 
