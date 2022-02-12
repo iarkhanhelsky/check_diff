@@ -2,10 +2,8 @@ package kubelinter
 
 import (
 	"errors"
-	"fmt"
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
 	"github.com/iarkhanhelsky/check_diff/pkg/mapper"
-	"go.uber.org/config"
 	"os"
 	"path"
 )
@@ -42,12 +40,4 @@ func (checker *KubeLinter) handleDownload(dstPath string) error {
 	}
 	checker.kubeLint = kubelint
 	return nil
-}
-
-func NewKubeLint(yaml *config.YAML) (core.Checker, error) {
-	kubeLinter := KubeLinter{}
-	if err := yaml.Get("KubeLinter").Populate(&kubeLinter); err != nil {
-		return nil, fmt.Errorf("can't create kube-linter: %v", err)
-	}
-	return &kubeLinter, nil
 }

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
 	"github.com/iarkhanhelsky/check_diff/pkg/downloader"
-	"go.uber.org/config"
 )
 
 type report struct {
@@ -53,14 +52,6 @@ var _ core.Checker = &Rubocop{}
 
 func (checker *Rubocop) Tag() string {
 	return "Rubocop"
-}
-
-func NewRubocop(yaml *config.YAML) (core.Checker, error) {
-	v := Rubocop{}
-	if err := yaml.Get("Rubocop").Populate(&v); err != nil {
-		return nil, fmt.Errorf("can't create Rubocop: %v", err)
-	}
-	return &v, nil
 }
 
 func (checker Rubocop) Downloads() []downloader.Interface {

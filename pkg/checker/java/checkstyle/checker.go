@@ -1,11 +1,9 @@
 package checkstyle
 
 import (
-	"fmt"
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
 	"github.com/iarkhanhelsky/check_diff/pkg/downloader"
 	"github.com/iarkhanhelsky/check_diff/pkg/mapper"
-	"go.uber.org/config"
 	"path"
 )
 
@@ -47,11 +45,3 @@ func (checker *Checkstyle) handleDownload(p string) error {
 }
 
 var _ core.Checker = &Checkstyle{}
-
-func NewCheckstyle(yaml *config.YAML) (core.Checker, error) {
-	v := Checkstyle{}
-	if err := yaml.Get(v.Tag()).Populate(&v); err != nil {
-		return nil, fmt.Errorf("can't create %s: %v", v.Tag(), err)
-	}
-	return &v, nil
-}
