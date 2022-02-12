@@ -6,6 +6,7 @@ import (
 	"github.com/iarkhanhelsky/check_diff/pkg/mapper"
 	"os"
 	"path"
+	"runtime"
 )
 
 var defaultCliArgs = []string{"lint", "--format", "sarif"}
@@ -30,7 +31,11 @@ func (checker *Checker) Check(ranges []core.LineRange) ([]core.Issue, error) {
 }
 
 func (checker *Checker) handleDownload(dstPath string) error {
-	kubelint := path.Join(dstPath, "kube-linter", "kube-linter")
+	exe := "kube-linter"
+	if runtime.GOOS == "windows" {
+		exe = "kube-linter.exe"
+	}
+	kubelint := path.Join(dstPath, "kube-linter", exe)
 	if _, err := os.Stat(kubelint); errors.Is(err, os.ErrNotExist) {
 		return err
 	}
