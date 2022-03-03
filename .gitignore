@@ -1,3 +1,4 @@
 .check_diff
 .idea
 target/
+dist/
