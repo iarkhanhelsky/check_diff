@@ -48,7 +48,7 @@ func (opts *CliOptions) parseArgs(args []string) error {
 	version := flagset.BoolP("version", "", false, "Print version and exit")
 
 	err := flagset.Parse(args[1:])
-	
+
 	opts.FailOnError = !(*noFailOnError)
 	opts.Trace = *trace
 	opts.NoColor = *noColor

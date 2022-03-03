@@ -13,6 +13,14 @@ type Settings struct {
 	Config  string   `yaml:"Config"`
 }
 
+func (settings Settings) CommandOrDefault(defaultCommand string) string {
+	if len(settings.Command) == 0 {
+		return defaultCommand
+	}
+
+	return settings.Command
+}
+
 func (settings Settings) Filter(ranges []LineRange, supportedExtensions ...string) []LineRange {
 	var result []LineRange
 	for _, r := range ranges {
@@ -21,14 +29,6 @@ func (settings Settings) Filter(ranges []LineRange, supportedExtensions ...strin
 		}
 	}
 	return result
-}
-
-func (settings Settings) CommandOrDefault(defaultCommand string) string {
-	if len(settings.Command) == 0 {
-		return defaultCommand
-	}
-
-	return settings.Command
 }
 
 func (settings Settings) isIncluded(r LineRange) bool {
@@ -46,7 +46,7 @@ func (settings Settings) isIncluded(r LineRange) bool {
 }
 
 func (settings Settings) isExcluded(r LineRange) bool {
-	if len(settings.Include) == 0 {
+	if len(settings.Exclude) == 0 {
 		return false
 	}
 
