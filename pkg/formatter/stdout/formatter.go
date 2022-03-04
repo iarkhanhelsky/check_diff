@@ -67,7 +67,10 @@ func (formatter *Formatter) fileBanner(issue core.Issue) {
 		if l == issue.Line {
 			w = formatter.writer.color(color.FgHiWhite)
 		}
-		w = w.printf(" %s\n", line).reset()
+		if len(line) != 0 {
+			w.printf(" %s", line)
+		}
+		w = w.printf("\n").reset()
 
 		if l == issue.Line {
 			w.color(color.FgWhite, color.Bold).printf(rjust("", ' ', margin+1+issue.Column) + "^\n")
