@@ -10,15 +10,6 @@ type contextReader interface {
 	readContext(path string, line int) ([]string, int, error)
 }
 
-var _ contextReader = &emptyReader{}
-
-type emptyReader struct {
-}
-
-func (*emptyReader) readContext(_ string, _ int) ([]string, int, error) {
-	return nil, 0, nil
-}
-
 var _ contextReader = &fileReader{}
 
 type fileReader struct {
