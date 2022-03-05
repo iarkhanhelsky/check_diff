@@ -24,8 +24,8 @@ var Module = fx.Options(
 		NewLogger,
 		command.NewCommand,
 	),
-	fx.Invoke(func(opts CliOptions) {
-		color.NoColor = opts.NoColor
+	fx.Invoke(func(cfg core.Config) {
+		color.NoColor = !cfg.Color
 	}),
 )
 

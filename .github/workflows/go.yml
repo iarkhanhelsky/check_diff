@@ -21,12 +21,9 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: 3.0
-        
-    - name: Set up tools
-      run: sudo apt-get install jq
 
     - name: Set up gems
-      run: cd example && bundle install
+      run: cd integration_tests && bundle install
 
     - name: Build
       run: make build
@@ -39,6 +36,3 @@ jobs:
       env:
         COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: goveralls -coverprofile=covprofile -service=github
-
-    - name: Integration test
-      run: cd example && ./test.sh ../target/check_diff

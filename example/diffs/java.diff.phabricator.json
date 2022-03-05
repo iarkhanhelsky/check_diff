@@ -1,5 +1,0 @@
-{"name":"javadoc.missing","code":"","severity":"error","path":"java/src/main/java/Main.java","description":"Missing a Javadoc comment.","line":1,"char":1}
-{"name":"indentation.error","code":"","severity":"error","path":"java/src/main/java/Main.java","description":"'class def lcurly' has incorrect indentation level 0, expected level should be 2.","line":2,"char":1}
-{"name":"line.previous","code":"","severity":"error","path":"java/src/main/java/Main.java","description":"'{' at column 1 should be on the previous line.","line":2,"char":1}
-{"name":"line.previous","code":"","severity":"error","path":"java/src/main/java/Main.java","description":"'{' at column 5 should be on the previous line.","line":4,"char":5}
-{"name":"indentation.child.error","code":"","severity":"error","path":"java/src/main/java/Main.java","description":"'method def' child has incorrect indentation level 8, expected level should be 6.","line":5,"char":9}

@@ -1,5 +1,6 @@
 CheckDiff:
   OutputFormat: stdout
+  Color: false
 
 Checkstyle:
   Enabled: true
