@@ -44,7 +44,7 @@ func (formatter *Formatter) Print(issues []core.Issue, w io.Writer) error {
 
 	uniqFiles := countUniqFiles(issues)
 	formatter.writer.color().printf("Total: %d in %d files\n", len(issues), uniqFiles).reset()
-	return formatter.writer.err()
+	return formatter.writer.err
 }
 
 func (formatter *Formatter) fileBanner(issue core.Issue) {

@@ -2,6 +2,7 @@ package stdout
 
 import (
 	"github.com/fatih/color"
+	"go.uber.org/multierr"
 	"io"
 )
 
@@ -9,7 +10,7 @@ type writer struct {
 	w io.Writer
 
 	attributes []color.Attribute
-	errors     []error
+	err        error
 }
 
 func (writer writer) reset() writer {
@@ -25,15 +26,7 @@ func (writer writer) color(colors ...color.Attribute) writer {
 func (writer writer) printf(format string, args ...interface{}) writer {
 	_, err := color.New(writer.attributes...).Fprintf(writer.w, format, args...)
 	if err != nil {
-		writer.errors = append(writer.errors, err)
+		writer.err = multierr.Append(writer.err, err)
 	}
 	return writer
-}
-
-func (writer writer) err() error {
-	if len(writer.errors) > 0 {
-		return writer.errors[0]
-	}
-
-	return nil
 }
