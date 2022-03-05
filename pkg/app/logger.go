@@ -1,13 +1,13 @@
 package app
 
 import (
+	"github.com/iarkhanhelsky/check_diff/pkg/app/command"
 	"go.uber.org/zap"
-	"os"
 )
 
-func NewLogger() (*zap.Logger, error) {
+func NewLogger(env command.Env) (*zap.Logger, error) {
 	trace := false
-	for _, arg := range os.Args {
+	for _, arg := range env.Args {
 		if arg == "--trace" {
 			trace = true
 			break
