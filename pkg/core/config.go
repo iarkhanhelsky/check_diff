@@ -9,6 +9,8 @@ type Config struct {
 	OutputFile   string `yaml:"OutputFile"`
 	VendorDir    string `yaml:"VendorDir"`
 	Color        bool   `yaml:"Color"`
+
+	InputFile string
 }
 
 func NewDefaultConfig() Config {

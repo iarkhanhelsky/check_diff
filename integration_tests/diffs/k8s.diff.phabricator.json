@@ -1,0 +1,3 @@
+{"name":"no-read-only-root-fs","code":"","severity":"error","path":"k8s/deployment.yaml","description":"container \"sec-ctx-demo\" does not have a read-only root file system\nobject: \u003cno namespace\u003e/security-context-demo /v1, Kind=Pod","line":1,"char":0}
+{"name":"unset-cpu-requirements","code":"","severity":"error","path":"k8s/deployment.yaml","description":"container \"sec-ctx-demo\" has cpu limit 0\nobject: \u003cno namespace\u003e/security-context-demo /v1, Kind=Pod","line":1,"char":0}
+{"name":"unset-memory-requirements","code":"","severity":"error","path":"k8s/deployment.yaml","description":"container \"sec-ctx-demo\" has memory limit 0\nobject: \u003cno namespace\u003e/security-context-demo /v1, Kind=Pod","line":1,"char":0}

@@ -6,8 +6,7 @@ import (
 )
 
 type Options struct {
-	Format     string
-	OutputFile string
+	Format string
 }
 
 var Module = fx.Options(fx.Provide(NewFormatter))

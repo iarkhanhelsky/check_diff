@@ -20,10 +20,9 @@ var Module = fx.Options(
 		NewCliOptions,
 		NewConfig,
 		NewYaml,
-		NewDiff,
 		NewFormatterOptions,
 		NewLogger,
-		command.NewCheck,
+		command.NewCommand,
 	),
 	fx.Invoke(func(opts CliOptions) {
 		color.NoColor = opts.NoColor
@@ -49,5 +48,8 @@ func NewConfig(cliOpts CliOptions, yaml *config.YAML) (core.Config, error) {
 	if len(cliOpts.Format) != 0 {
 		cfg.OutputFormat = cliOpts.Format
 	}
+
+	cfg.InputFile = cliOpts.InputFile
+
 	return cfg, err
 }

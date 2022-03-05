@@ -6,16 +6,21 @@ import (
 	"go.uber.org/fx"
 )
 
-func Main() {
-	var check command.Check
-	app := fx.New(fx.Options(Module, fx.Populate(&check)))
+func Main(env command.Env) error {
+	var check command.Command
+	app := fx.New(
+		fx.Provide(func() command.Env { return env }),
+		fx.Options(Module, fx.Populate(&check)))
+
 	if err := app.Start(context.Background()); err != nil {
-		panic(err)
+		return err
 	}
 	if err := check.Run(); err != nil {
-		panic(err)
+		return err
 	}
 	if err := app.Stop(context.Background()); err != nil {
-		panic(err)
+		return err
 	}
+
+	return nil
 }

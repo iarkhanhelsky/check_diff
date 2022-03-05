@@ -1,11 +1,10 @@
 package app
 
 import (
-	"fmt"
+	"github.com/iarkhanhelsky/check_diff/pkg/app/command"
 	"github.com/iarkhanhelsky/check_diff/pkg/formatter"
 	flag "github.com/spf13/pflag"
 	"io"
-	"os"
 	"strings"
 )
 
@@ -61,18 +60,19 @@ func newCliOptions(output io.Writer) *CliOptions {
 	return &CliOptions{output: output}
 }
 
-func NewCliOptions() CliOptions {
-	opts := newCliOptions(os.Stdout)
-	err := opts.parseArgs(os.Args)
+func NewCliOptions(env command.Env) (CliOptions, command.Type, error) {
+	var commandType = command.RunNone
+	opts := newCliOptions(env.OutWriter)
+	err := opts.parseArgs(env.Args)
 	if err == flag.ErrHelp {
-		os.Exit(0)
+		err = nil // Showed help
 	} else if err != nil {
-		fmt.Printf("error: %v\n", err)
-		os.Exit(2)
+
 	} else if opts.version {
-		fmt.Printf("check_diff v%s\n", Version)
-		os.Exit(0)
+		commandType = command.RunVersion
+	} else {
+		commandType = command.RunCheck
 	}
 
-	return *opts
+	return *opts, commandType, err
 }

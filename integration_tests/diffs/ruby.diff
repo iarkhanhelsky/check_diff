@@ -1,0 +1,11 @@
+diff --git a/ruby/main.rb b/ruby/main.rb
+index e69de29..7cb008c 100644
+--- a/ruby/main.rb
++++ b/ruby/main.rb
+@@ -0,0 +1,6 @@
++def fibonacci( n )
++    [ n ] if ( 0..1 ).include? n
++    ( fibonacci( n - 1 ) + fibonacci( n - 2 ) ) if n > 1
++end
++
++puts fibonacci( 5 )

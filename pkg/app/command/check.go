@@ -1,54 +1,77 @@
 package command
 
 import (
+	"bufio"
 	"fmt"
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
-	"go.uber.org/fx"
+	"github.com/iarkhanhelsky/check_diff/pkg/formatter"
 	"go.uber.org/zap"
 	"io"
 	"os"
 	"time"
 )
 
-type Params struct {
-	fx.In
-
-	LineRanges []core.LineRange
-	Checkers   []core.Checker `group:"checkers"`
-	Formatter  core.Formatter
-	Config     core.Config
-	Logger     *zap.Logger
-}
-
 type Check struct {
-	LineRanges []core.LineRange
-	Checkers   []core.Checker
-	Formatter  core.Formatter
-	Config     core.Config
-	Logger     *zap.SugaredLogger
+	Env      Env
+	Checkers []core.Checker
+	Config   core.Config
+	Logger   *zap.SugaredLogger
 }
 
-func NewCheck(params Params) Check {
-	return Check{
-		LineRanges: params.LineRanges,
-		Checkers:   params.Checkers,
-		Formatter:  params.Formatter,
-		Config:     params.Config,
-		Logger:     params.Logger.Sugar(),
+var _ Command = &Check{}
+
+func NewCheck(env Env, config core.Config, checkers []core.Checker, logger *zap.SugaredLogger) Command {
+	return &Check{
+		Env:      env,
+		Config:   config,
+		Checkers: checkers,
+		Logger:   logger,
 	}
 }
 
 func (check *Check) Run() error {
-	if err := check.download(); err != nil {
+	var err error
+	if err = check.download(); err != nil {
 		return fmt.Errorf("failed to download dependencies: %v", err)
 	}
 
-	issues, err := check.runChecks()
+	var ranges []core.LineRange
+	if ranges, err = check.readDiff(); err != nil {
+		return fmt.Errorf("failed to download dependencies: %v", err)
+	}
+
+	issues, err := check.runChecks(ranges)
 	if err != nil {
 		return err
 	}
 
 	return check.writeIssues(issues)
+}
+
+func (check *Check) readDiff() ([]core.LineRange, error) {
+	var reader io.Reader
+
+	config := check.Config
+	logger := check.Logger
+	if len(config.InputFile) == 0 {
+		logger.Debugf("reading diff from STDIN")
+		reader = os.Stdin
+	} else {
+		file, err := os.Open(config.InputFile)
+		logger.With("file", config.InputFile).Debugf("reading diff from file")
+		if err != nil {
+			return nil, fmt.Errorf("can't read file: %s: %v", config.InputFile, err)
+		}
+		defer file.Close()
+		reader = file
+	}
+
+	parser := core.NewDiffParser()
+	for scanner := bufio.NewScanner(reader); scanner.Scan(); {
+		parser.ParseNextLine(scanner.Text())
+	}
+
+	return parser.Result(), nil
 }
 
 func (check *Check) download() error {
@@ -67,7 +90,7 @@ func (check *Check) download() error {
 	return nil
 }
 
-func (check *Check) runChecks() ([]core.Issue, error) {
+func (check *Check) runChecks(lineRanges []core.LineRange) ([]core.Issue, error) {
 	var issues []core.Issue
 
 	issueChan := make(chan []core.Issue)
@@ -77,7 +100,7 @@ func (check *Check) runChecks() ([]core.Issue, error) {
 		ch := checker
 		go func() {
 			start := time.Now()
-			r, err := ch.Check(check.LineRanges)
+			r, err := ch.Check(lineRanges)
 			duration := time.Since(start)
 
 			if err != nil {
@@ -106,7 +129,7 @@ func (check *Check) writeIssues(issues []core.Issue) error {
 	var writer io.Writer
 	outFile := check.Config.OutputFile
 	if len(outFile) == 0 {
-		writer = os.Stdout
+		writer = check.Env.OutWriter
 	} else {
 		file, err := os.Create(outFile)
 		defer file.Close()
@@ -116,7 +139,11 @@ func (check *Check) writeIssues(issues []core.Issue) error {
 		writer = file
 	}
 
-	if err := check.Formatter.Print(issues, writer); err != nil {
+	formatter, err := formatter.NewFormatter(formatter.Options{Format: check.Config.OutputFormat})
+	if err != nil {
+		return fmt.Errorf("can't create formatter: %v", err)
+	}
+	if err := formatter.Print(issues, writer); err != nil {
 		return fmt.Errorf("can't print issues: %v", err)
 	}
 
