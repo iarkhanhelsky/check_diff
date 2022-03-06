@@ -1,9 +1,7 @@
 package core
 
 import (
-	"bytes"
 	"fmt"
-	"os/exec"
 )
 
 type Flow interface {
@@ -11,6 +9,12 @@ type Flow interface {
 }
 
 type FlowOption func(*flow)
+type Converter func([]byte) ([]Issue, error)
+type ArgFunction func(lineRange LineRange) []string
+
+var DefaultArgFunction ArgFunction = func(lineRange LineRange) []string {
+	return []string{lineRange.File}
+}
 
 func WithCommand(command string, args ...string) FlowOption {
 	return func(f *flow) {
@@ -31,10 +35,19 @@ func WithFileExtensions(exts ...string) FlowOption {
 	}
 }
 
-type Converter func([]byte) ([]Issue, error)
+func WithShellOptions(opts ...ShellOption) FlowOption {
+	return func(f *flow) {
+		f.shellOptions = opts
+	}
+}
 
 func NewFlow(tag string, s Settings, opts ...FlowOption) Flow {
-	f := flow{tag: tag, settings: s}
+	f := flow{
+		tag:          tag,
+		settings:     s,
+		argFunction:  DefaultArgFunction,
+		shellOptions: []ShellOption{AllowExitCodes(0, 1)},
+	}
 	for _, o := range opts {
 		o(&f)
 	}
@@ -47,6 +60,8 @@ type flow struct {
 	settings            Settings
 	command             string
 	args                []string
+	argFunction         ArgFunction
+	shellOptions        []ShellOption
 	converter           Converter
 	supportedExtensions []string
 }
@@ -59,29 +74,27 @@ func (f *flow) Run(ranges []LineRange) ([]Issue, error) {
 		return []Issue{}, nil
 	}
 
-	args := []string{}
-	args = append(args, f.args...)
-
+	args := f.args
 	for _, r := range matchedRanges {
-		args = append(args, r.File)
+		args = append(args, f.argFunction(r)...)
 	}
 
-	cmd := exec.Command(f.command, args...)
-
-	var stdout, stderr bytes.Buffer
-
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-
-	if err := cmd.Run(); err != nil && cmd.ProcessState.ExitCode() != 1 {
-		return nil, fmt.Errorf("failed to run %s: %v: %s", f.tag, err, string(stderr.Bytes()))
+	output, err := NewLocalShell(f.shellOptions...).Execute(f.command, args...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute %s issues: %v", f.tag, err)
 	}
 
-	issues, err := f.converter(stdout.Bytes())
+	issues, err := f.converter(output)
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert %s issues: %v", f.tag, err)
 	}
 
+	issues = filterIssues(ranges, issues)
+
+	return issues, nil
+}
+
+func filterIssues(ranges []LineRange, issues []Issue) []Issue {
 	sz := 0
 	for _, issue := range issues {
 		matched := false
@@ -96,5 +109,6 @@ func (f *flow) Run(ranges []LineRange) ([]Issue, error) {
 			sz++
 		}
 	}
-	return issues[:sz], nil
+
+	return issues[:sz]
 }
