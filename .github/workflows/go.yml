@@ -29,7 +29,7 @@ jobs:
       run: make build
 
     - name: Test
-      run: go test -v -coverpkg=./pkg/... -covermode atomic -coverprofile=covprofile ./...
+      run: go test -v -covermode atomic -coverprofile=covprofile ./...
     - name: Install goveralls
       run: go install github.com/mattn/goveralls@latest
     - name: Send coverage
