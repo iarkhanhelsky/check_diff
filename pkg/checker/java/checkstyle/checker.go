@@ -23,7 +23,7 @@ func (checker *Checker) Check(ranges []core.LineRange) ([]core.Issue, error) {
 	//  -f sarif \
 	// ...files
 	args := []string{"-jar", checker.checkstyle, "-c", checker.Config, "-f", "sarif"}
-	return core.NewFlow("checkstyle", checker.Settings,
+	return core.NewFlow(checker.Tag(), checker.Settings,
 		core.WithCommand("java", args...),
 		core.WithFileExtensions(".java"),
 		core.WithConverter(mapper.SarifBytesToIssues),

@@ -9,8 +9,6 @@ import (
 	"runtime"
 )
 
-var defaultCliArgs = []string{"lint", "--format", "sarif"}
-
 type Checker struct {
 	core.Settings `yaml:",inline"`
 	kubeLint      string
@@ -23,8 +21,8 @@ func (checker *Checker) Tag() string {
 }
 
 func (checker *Checker) Check(ranges []core.LineRange) ([]core.Issue, error) {
-	return core.NewFlow("kube-linter", checker.Settings,
-		core.WithCommand(checker.CommandOrDefault(checker.kubeLint), defaultCliArgs...),
+	return core.NewFlow(checker.Tag(), checker.Settings,
+		core.WithCommand(checker.CommandOrDefault(checker.kubeLint), "lint", "--format", "sarif"),
 		core.WithFileExtensions(".yaml", ".yml"),
 		core.WithConverter(mapper.SarifBytesToIssues),
 	).Run(ranges)
