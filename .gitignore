@@ -2,3 +2,5 @@
 .idea
 target/
 dist/
+coverage.html
+coverage.out
