@@ -21,8 +21,14 @@ func (checker *Checker) Tag() string {
 }
 
 func (checker *Checker) Check(ranges []core.LineRange) ([]core.Issue, error) {
+	args := []string{"lint", "--format", "sarif"}
+
+	if len(checker.Config) != 0 {
+		args = append(args, "--config", checker.Config)
+	}
+
 	return core.NewFlow(checker.Tag(), checker.Settings,
-		core.WithCommand(checker.CommandOrDefault(checker.kubeLint), "lint", "--format", "sarif"),
+		core.WithCommand(checker.CommandOrDefault(checker.kubeLint), args...),
 		core.WithFileExtensions(".yaml", ".yml"),
 		core.WithConverter(mapper.SarifBytesToIssues),
 	).Run(ranges)
