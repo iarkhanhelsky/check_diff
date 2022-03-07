@@ -2,7 +2,7 @@ package rubocop
 
 import (
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
-	"github.com/iarkhanhelsky/check_diff/pkg/downloader"
+	"github.com/iarkhanhelsky/check_diff/pkg/tools"
 )
 
 type Checker struct {
@@ -11,12 +11,16 @@ type Checker struct {
 
 var _ core.Checker = &Checker{}
 
+func NewChecker() core.Checker {
+	return &Checker{}
+}
+
 func (checker *Checker) Tag() string {
 	return "Rubocop"
 }
 
-func (checker Checker) Downloads() []downloader.Interface {
-	return downloader.Empty
+func (checker Checker) Downloads() []tools.Downloader {
+	return tools.Empty
 }
 
 func (checker Checker) Check(ranges []core.LineRange) ([]core.Issue, error) {

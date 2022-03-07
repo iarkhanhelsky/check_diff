@@ -5,12 +5,12 @@ import (
 	"go.uber.org/fx"
 )
 
-type Options struct {
+type Params struct {
 	Format string
 }
 
 var Module = fx.Options(fx.Provide(NewFormatter))
 
-func NewFormatter(opts Options) (core.Formatter, error) {
-	return Format(opts.Format).Formatter()
+func NewFormatter(p Params) (core.Formatter, error) {
+	return Format(p.Format).Formatter()
 }

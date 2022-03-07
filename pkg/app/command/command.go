@@ -2,6 +2,7 @@ package command
 
 import (
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
+	"github.com/iarkhanhelsky/check_diff/pkg/tools"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 )
@@ -24,8 +25,9 @@ type Params struct {
 	Type     Type
 	Env      Env
 	Checkers []core.Checker `group:"checkers"`
+	Registry tools.Registry
 	Config   core.Config
-	Logger   *zap.Logger
+	Logger   *zap.SugaredLogger
 }
 
 func NewCommand(params Params) (Command, error) {
@@ -33,7 +35,7 @@ func NewCommand(params Params) (Command, error) {
 	var err error
 	switch params.Type {
 	case RunCheck:
-		cmd = NewCheck(params.Env, params.Config, params.Checkers, params.Logger.Sugar())
+		cmd = NewCheck(params.Env, params.Config, params.Checkers, params.Logger, params.Registry)
 	case RunVersion:
 		cmd = NewVersion(params.Env)
 	case RunNone:

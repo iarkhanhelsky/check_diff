@@ -1,4 +1,4 @@
-package downloader
+package tools
 
 import (
 	"crypto/md5"
@@ -21,7 +21,7 @@ type httpDownloader struct {
 	handler Handler
 }
 
-func NewHTTPDownloader(handler Handler, dstFile string, md5 string, sha256 string, urls ...string) Interface {
+func NewHTTPDownloader(handler Handler, dstFile string, md5 string, sha256 string, urls ...string) Downloader {
 	return &httpDownloader{urls, md5, sha256, dstFile, handler}
 }
 

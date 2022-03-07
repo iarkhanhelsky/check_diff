@@ -3,28 +3,33 @@ package command
 import (
 	"bufio"
 	"fmt"
-	"github.com/iarkhanhelsky/check_diff/pkg/core"
-	"github.com/iarkhanhelsky/check_diff/pkg/formatter"
-	"go.uber.org/zap"
+	"github.com/iarkhanhelsky/check_diff/pkg/tools"
+	"github.com/pkg/errors"
 	"io"
 	"os"
 	"time"
+
+	"github.com/iarkhanhelsky/check_diff/pkg/core"
+	"github.com/iarkhanhelsky/check_diff/pkg/formatter"
+	"go.uber.org/zap"
 )
 
 type Check struct {
 	Env      Env
 	Checkers []core.Checker
 	Config   core.Config
+	Registry tools.Registry
 	Logger   *zap.SugaredLogger
 }
 
 var _ Command = &Check{}
 
-func NewCheck(env Env, config core.Config, checkers []core.Checker, logger *zap.SugaredLogger) Command {
+func NewCheck(env Env, config core.Config, checkers []core.Checker, logger *zap.SugaredLogger, registry tools.Registry) Command {
 	return &Check{
 		Env:      env,
 		Config:   config,
 		Checkers: checkers,
+		Registry: registry,
 		Logger:   logger,
 	}
 }
@@ -77,17 +82,17 @@ func (check *Check) readDiff() ([]core.LineRange, error) {
 func (check *Check) download() error {
 	err := os.MkdirAll(check.Config.VendorDir, 0755)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to download binaries")
 	}
+
+	var binaries []*tools.Binary
 	for _, checker := range check.Checkers {
-		for _, download := range checker.Downloads() {
-			if err := download.Download(check.Config.VendorDir); err != nil {
-				return err
-			}
+		if c, ok := checker.(core.Binaries); ok {
+			binaries = append(binaries, c.Binaries()...)
 		}
 	}
 
-	return nil
+	return check.Registry.Install(binaries...)
 }
 
 func (check *Check) runChecks(lineRanges []core.LineRange) ([]core.Issue, error) {
@@ -139,7 +144,7 @@ func (check *Check) writeIssues(issues []core.Issue) error {
 		writer = file
 	}
 
-	formatter, err := formatter.NewFormatter(formatter.Options{Format: check.Config.OutputFormat})
+	formatter, err := formatter.NewFormatter(formatter.Params{Format: check.Config.OutputFormat})
 	if err != nil {
 		return fmt.Errorf("can't create formatter: %v", err)
 	}
