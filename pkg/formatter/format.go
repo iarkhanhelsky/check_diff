@@ -22,14 +22,12 @@ func (format Format) String() string {
 }
 
 func (format Format) Formatter() (core.Formatter, error) {
-	switch string(format) {
-	case "stdout":
+	switch format {
+	case STDOUT:
 		return stdout.NewFormatter(), nil
-	case "gitlab":
+	case Gitlab, Codeclimate:
 		return &codeclimate.Formatter{}, nil
-	case "codeclimate":
-		return &codeclimate.Formatter{}, nil
-	case "phabricator":
+	case Phabricator:
 		return &phabricator.Formatter{}, nil
 	}
 
