@@ -2,10 +2,12 @@ package tools
 
 import (
 	"github.com/pkg/errors"
+	"go.uber.org/multierr"
 	"go.uber.org/zap"
 	"os"
 	"path"
 	"path/filepath"
+	"sync"
 )
 
 type Registry interface {
@@ -27,26 +29,67 @@ type registry struct {
 var _ Registry = &registry{}
 
 func (registry *registry) Install(binaries ...*Binary) error {
+	var wg sync.WaitGroup
+	wg.Add(len(binaries))
+	errchan := make(chan error)
+	done := make(chan bool)
 	for _, binary := range binaries {
-		if err := registry.ensureBinary(binary); err != nil {
-			return err
-		}
+		bin := binary
+		go func() {
+			errchan <- registry.ensureBinary(bin)
+			wg.Done()
+		}()
 	}
 
-	return nil
+	var err error
+	go func() {
+		for {
+			select {
+			case <-done:
+				return
+			case e := <-errchan:
+				err = multierr.Append(err, e)
+			}
+		}
+	}()
+
+	wg.Wait()
+	done <- true
+
+	return err
 }
 
 func (registry *registry) ensureBinary(binary *Binary) error {
 	logger := registry.logger.With("binary", binary.Name)
+
+	logger.Debug("check if we already have this binary")
+	if registry.uptodate(binary) {
+		logger.Debug("binary is up to date")
+		goto install
+	}
+
+	if err := os.MkdirAll(registry.binHome(binary), 0755); err != nil {
+		logger.With("err", err, "dir", registry.binHome(binary)).Error("failed to create directory")
+		return err
+	}
+
 	logger.Debug("ensuring binary")
 	if err := registry.fetch(binary); err != nil {
 		logger.With("err", err).Errorf("fetch failed")
 		return errors.Wrapf(err, "fetch failed; binary = %s", binary.Name)
 	}
+
 	if err := registry.unpack(binary); err != nil {
 		logger.With("err", err).Errorf("unpack failed")
 		return errors.Wrapf(err, "unpack failed; binary = %s", binary.Name)
 	}
+
+	if err := registry.writeManifest(binary); err != nil {
+		logger.With("err", err).Errorf("failed to write digest")
+		return errors.Wrapf(err, "digest failed; binary = %s", binary.Name)
+	}
+
+install:
 	if err := registry.install(binary); err != nil {
 		logger.With("err", err).Errorf("install failed")
 		return errors.Wrapf(err, "install failed; binary = %s", binary.Name)
@@ -55,18 +98,26 @@ func (registry *registry) ensureBinary(binary *Binary) error {
 	return nil
 }
 
+func (registry registry) uptodate(binary *Binary) bool {
+	logger := registry.logger.With("binary", binary.Name)
+	logger.Debug("checking digest")
+	return newManifest(registry.binHome(binary), binary, registry.logger).isDiffer()
+}
+
+func (registry registry) binHome(binary *Binary, other ...string) string {
+	return path.Join(append([]string{registry.vendorDir, binary.Name}, other...)...)
+}
+
 func (registry registry) fetch(binary *Binary) error {
 	logger := registry.logger.With("binary", binary.Name)
 	logger.Debug("fetching binary")
-	handler := func(_ string) error { return nil }
 	targetSource, err := binary.selectSource()
 	if err != nil {
 		return err
 	}
-	downloader := NewHTTPDownloader(handler, binary.DstFile,
-		targetSource.MD5, targetSource.SHA256, targetSource.Urls...)
+	downloader := newHTTPDownloader(targetSource.MD5, targetSource.SHA256, targetSource.Urls...)
 
-	dstFolder := path.Join(registry.vendorDir, binary.Name, "_dist")
+	dstFolder := path.Join(registry.binHome(binary), "_dist")
 	logger.With("dist", dstFolder).Debug("create dist folder")
 	if err := os.MkdirAll(dstFolder, 0755); err != nil {
 		logger.With("dist", dstFolder).With("err", err).Error("failed to create dist")
@@ -81,7 +132,12 @@ func (registry registry) fetch(binary *Binary) error {
 	files, _ := filepath.Glob(path.Join(dstFolder, "*"))
 	for _, file := range files {
 		source, _ := filepath.Abs(file)
-		target := path.Join(registry.vendorDir, binary.Name, path.Base(file))
+		fileName := targetSource.DstFile
+		if fileName == "" {
+			fileName = binary.DstFile
+		}
+
+		target := path.Join(registry.binHome(binary), fileName)
 		if _, err := os.Stat(target); err == nil {
 			logger.With("source", file).With("target", target).Debug("exists removing")
 			continue
@@ -98,13 +154,19 @@ func (registry registry) fetch(binary *Binary) error {
 func (registry registry) unpack(binary *Binary) error {
 	logger := registry.logger.With("binary", binary.Name)
 	logger.Debug("unpacking binary")
-	return unpack{logger: logger, dir: path.Join(registry.vendorDir, binary.Name)}.unpackAll()
+	return unpack{logger: logger, dir: registry.binHome(binary)}.unpackAll()
+}
+
+func (registry registry) writeManifest(binary *Binary) error {
+	logger := registry.logger.With("binary", binary.Name)
+	logger.Debug("writing manifest")
+	return newManifest(registry.binHome(binary), binary, registry.logger).saveManifest()
 }
 
 func (registry registry) install(binary *Binary) error {
 	logger := registry.logger.With("binary", binary.Name)
 	logger.Debug("installing binary")
-	binary.executable = path.Join(registry.vendorDir, binary.Name, binary.Path)
+	binary.executable = path.Join(registry.binHome(binary), binary.Path)
 	logger.With("executable", binary.executable).Debug("binary path updated")
 	return nil
 }

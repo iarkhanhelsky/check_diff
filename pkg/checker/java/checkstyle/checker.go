@@ -4,6 +4,7 @@ import (
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
 	"github.com/iarkhanhelsky/check_diff/pkg/mapper"
 	"github.com/iarkhanhelsky/check_diff/pkg/tools"
+	"strings"
 )
 
 type Checker struct {
@@ -16,6 +17,11 @@ type Checker struct {
 var _ core.Checker = &Checker{}
 var _ core.Binaries = &Checker{}
 
+const (
+	checkstyleVersion     = "9.3"
+	checkstyleUrlTemplate = "https://github.com/checkstyle/checkstyle/releases/download/checkstyle-@VERSION/checkstyle-@VERSION-all.jar"
+)
+
 func NewChecker() core.Checker {
 	return &Checker{
 		checkstyleJar: &tools.Binary{
@@ -24,7 +30,7 @@ func NewChecker() core.Checker {
 			Path:    "checkstyle-all.jar",
 			Targets: map[tools.TargetTuple]tools.TargetSource{
 				tools.Any: {
-					Urls:   []string{"https://github.com/checkstyle/checkstyle/releases/download/checkstyle-9.3/checkstyle-9.3-all.jar"},
+					Urls:   []string{strings.ReplaceAll(checkstyleUrlTemplate, "@VERSION", checkstyleVersion)},
 					MD5:    "970092a4271e5388b13055db1df485dd",
 					SHA256: "02ad3307e46059a7c4f8af6c5f61f477bc5fd910e56afb145c45904c95d213ac",
 				},

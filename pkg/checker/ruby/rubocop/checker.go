@@ -2,7 +2,6 @@ package rubocop
 
 import (
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
-	"github.com/iarkhanhelsky/check_diff/pkg/tools"
 )
 
 type Checker struct {
@@ -17,10 +16,6 @@ func NewChecker() core.Checker {
 
 func (checker *Checker) Tag() string {
 	return "Rubocop"
-}
-
-func (checker Checker) Downloads() []tools.Downloader {
-	return tools.Empty
 }
 
 func (checker Checker) Check(ranges []core.LineRange) ([]core.Issue, error) {

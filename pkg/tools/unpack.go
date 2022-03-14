@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/saracen/fastzip"
 	"go.uber.org/zap"
+	"os"
 	"path"
 	"path/filepath"
 )
@@ -25,6 +26,7 @@ func (unpack unpack) unpackAll() error {
 }
 
 func unzip(src string, dst string) error {
+	defer os.Remove(src)
 	// Create new extractor
 	e, err := fastzip.NewExtractor(src, dst)
 	if err != nil {

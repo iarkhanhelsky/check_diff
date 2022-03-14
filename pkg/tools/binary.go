@@ -1,14 +1,18 @@
 package tools
 
 import (
+	"crypto/sha256"
+	stbinary "encoding/binary"
+	"encoding/json"
 	"fmt"
 	"github.com/pkg/errors"
-	"os"
-	"path"
 	"runtime"
 )
 
 type TargetTuple string
+
+// When this version changes all binaries will be re-downloaded
+const serialVersion uint64 = 1
 
 const (
 	Any         TargetTuple = "any"
@@ -20,26 +24,19 @@ const (
 )
 
 type TargetSource struct {
-	Urls    []string
-	MD5     string
-	SHA256  string
-	DstFile string
+	Urls    []string `json:"urls"`
+	MD5     string   `json:"md5"`
+	SHA256  string   `json:"sha256"`
+	DstFile string   `json:"dstFile"`
 }
 
 type Binary struct {
-	Name    string
-	DstFile string
-	Path    string
-	Targets map[TargetTuple]TargetSource
+	Name    string                       `json:"name"`
+	Path    string                       `json:"path"`
+	Targets map[TargetTuple]TargetSource `json:"targets"`
+	DstFile string                       `json:"dstFile"`
 
 	executable string
-}
-
-var _ Downloader = &Binary{}
-
-func (binary *Binary) Download(vendorDir string) error {
-
-	return nil
 }
 
 func (binary *Binary) Executable() string {
@@ -61,16 +58,12 @@ func (binary Binary) selectSource() (TargetSource, error) {
 	return targetSource, fmt.Errorf("failed to find target source; binary = %s", binary.Name)
 }
 
-func (binary *Binary) handleDownload(dstFolder string) error {
-	executable := path.Join(dstFolder, binary.DstFile)
-
-	if _, err := os.Stat(executable); err == os.ErrNotExist {
-		return errors.Wrapf(err, "failed to setup %s", binary.Name)
+func (binary Binary) digest() ([32]byte, error) {
+	data, err := json.Marshal(&binary)
+	if err != nil {
+		return [32]byte{}, errors.Wrapf(err, "failed to calculate digest binary=%s", binary.Name)
 	}
+	stbinary.LittleEndian.PutUint64(data, serialVersion)
 
-	if err := os.Chmod(executable, 0755); err != nil {
-		return errors.Wrapf(err, "failed to setup %s", binary.Name)
-	}
-	binary.executable = executable
-	return nil
+	return sha256.Sum256(data), nil
 }
