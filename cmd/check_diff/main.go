@@ -6,9 +6,17 @@ import (
 	"os"
 )
 
+// This values are populated by go-releaser
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+)
+
 func main() {
 	err := app.Main(command.Env{
 		Args: os.Args, OutWriter: os.Stdout, ErrWriter: os.Stderr,
+		Version: version, Commit: commit, Date: date,
 	})
 
 	if err != nil {
