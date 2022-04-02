@@ -13,7 +13,7 @@ builds:
       - linux
       # - windows
       - darwin
-    main: ./cmd/check_diff
+    main: .
 archives:
   - replacements:
       darwin: Darwin
