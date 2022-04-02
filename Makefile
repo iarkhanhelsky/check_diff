@@ -8,4 +8,4 @@ vet:
 check: test vet
 
 build:
-	go build -o target/check_diff ./cmd/...
+	go build -o target/check_diff .
