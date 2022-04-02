@@ -62,3 +62,7 @@ func NewConfig(cliOpts CliOptions, yaml *config.YAML) (core.Config, error) {
 
 	return cfg, err
 }
+
+func NewYaml(options CliOptions) (*config.YAML, error) {
+	return config.NewYAML(config.File(options.ConfigFile))
+}

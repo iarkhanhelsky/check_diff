@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-// This values are populated by go-releaser
+// These values are populated by go-releaser
 var (
 	version = "dev"
 	commit  = "none"
