@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -32,4 +33,47 @@ func TestBinary_Digest(t *testing.T) {
 	assert.NoError(t, err)
 	ydigest, err := y.digest()
 	assert.NotEqual(t, xdigest, ydigest)
+}
+
+func Test_SelectSource(t *testing.T) {
+	testCases := map[string]struct {
+		targets       map[TargetTuple]TargetSource
+		target        TargetTuple
+		expected      TargetSource
+		expectedError error
+	}{
+		"Any always wins": {
+			targets: map[TargetTuple]TargetSource{
+				Any:     {MD5: "xxx"},
+				Current: {MD5: "zzz"},
+			},
+			target:   Current,
+			expected: TargetSource{MD5: "xxx"},
+		},
+		"select by target platform": {
+			targets: map[TargetTuple]TargetSource{
+				LinuxAMD64: {MD5: "xxx"},
+				LinuxARM64: {MD5: "zzz"},
+			},
+			target:   LinuxAMD64,
+			expected: TargetSource{MD5: "xxx"},
+		},
+		"missing target": {
+			targets:       map[TargetTuple]TargetSource{},
+			target:        LinuxAMD64,
+			expected:      TargetSource{},
+			expectedError: errors.New("failed to find target source; platform = " + string(LinuxAMD64)),
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			assert := assert.New(t)
+			src, err := selectSource(tc.targets, tc.target)
+			if tc.expectedError != nil {
+				assert.EqualError(tc.expectedError, err.Error())
+			}
+			assert.Equal(tc.expected, src)
+		})
+	}
 }

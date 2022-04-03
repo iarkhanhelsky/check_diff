@@ -4,7 +4,6 @@ import (
 	"crypto/sha256"
 	stbinary "encoding/binary"
 	"encoding/json"
-	"fmt"
 	"github.com/pkg/errors"
 	"runtime"
 )
@@ -44,18 +43,23 @@ func (binary *Binary) Executable() string {
 }
 
 func (binary Binary) selectSource() (TargetSource, error) {
+	src, err := selectSource(binary.Targets, Current)
+	return src, errors.Wrap(err, "binary = "+binary.Name)
+}
+
+func selectSource(targets map[TargetTuple]TargetSource, target TargetTuple) (TargetSource, error) {
 	var targetSource TargetSource
-	targetSource, ok := binary.Targets[Any]
+	targetSource, ok := targets[Any]
 	if ok {
 		return targetSource, nil
 	}
 
-	targetSource, ok = binary.Targets[Current]
+	targetSource, ok = targets[target]
 	if ok {
 		return targetSource, nil
 	}
 
-	return targetSource, fmt.Errorf("failed to find target source; binary = %s", binary.Name)
+	return targetSource, errors.New("failed to find target source; platform = " + string(target))
 }
 
 func (binary Binary) digest() ([32]byte, error) {

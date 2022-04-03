@@ -41,16 +41,17 @@ func newManifestEntry(path string) manifestEntry {
 }
 
 type manifest struct {
-	dir    string
-	binary *Binary
-	logger *zap.SugaredLogger
+	dir          string
+	binaryDigest [32]byte
+	logger       *zap.SugaredLogger
 }
 
 func newManifest(dir string, binary *Binary, logger *zap.SugaredLogger) manifest {
+	digest, _ := binary.digest()
 	return manifest{
-		dir:    dir,
-		binary: binary,
-		logger: logger.Named("manifest").With("binary", binary.Name),
+		dir:          dir,
+		binaryDigest: digest,
+		logger:       logger.Named("manifest").With("binary", binary.Name),
 	}
 }
 
@@ -76,7 +77,7 @@ func (m manifest) saveManifest() error {
 func (m manifest) writeManifest(w io.Writer) error {
 	encoder := gob.NewEncoder(w)
 	logger := m.logger
-	digest, _ := m.binary.digest()
+	digest := m.binaryDigest
 	logger.With("digest", fmt.Sprintf("%x", digest)).Debug("binary digest")
 	if err := encoder.Encode(digest); err != nil {
 		return err
@@ -114,7 +115,7 @@ func (m manifest) isDiffer() bool {
 	}
 
 	if bytes.Compare(data, buffer.Bytes()) == 0 {
-		return true
+		return false
 	}
 
 	logger.
@@ -126,5 +127,5 @@ func (m manifest) isDiffer() bool {
 		With("size", len(buffer.Bytes())).
 		Debug("expected")
 
-	return false
+	return true
 }
