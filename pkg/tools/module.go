@@ -11,5 +11,5 @@ type Params struct {
 }
 
 var Module = fx.Provide(func(p Params) Registry {
-	return NewRegistry(p.Logger, p.VendorDir)
+	return NewRegistry(p.VendorDir, p.Logger)
 })

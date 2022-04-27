@@ -63,12 +63,12 @@ func (m manifest) saveManifest() error {
 	defer file.Close()
 	if err != nil {
 		logger.With("err", err).Error("failed to save manifest")
-		return err
+		return fmt.Errorf("writing manifest: %w", err)
 	}
 
 	writer := bufio.NewWriter(file)
 	if err := m.writeManifest(writer); err != nil {
-		return err
+		return fmt.Errorf("writing manifest: %w", err)
 	}
 
 	return writer.Flush()
@@ -103,15 +103,15 @@ func (m manifest) isDiffer() bool {
 	logger.With("path", manifestFile).Debug("reading manifest file")
 	data, err := ioutil.ReadFile(manifestFile)
 	if err != nil {
-		logger.With("err", err).Error("failed to read manifest file")
-		return false
+		logger.With("err", err).Error("failed to read manifest file: differ = true")
+		return true
 	}
 
 	var buffer bytes.Buffer
 	logger.Debug("creating uptodate manifest blob")
 	if err := m.writeManifest(&buffer); err != nil {
-		logger.With("err", err).Error("failed create digest blob")
-		return false
+		logger.With("err", err).Error("failed create digest blob: differ = true")
+		return true
 	}
 
 	if bytes.Compare(data, buffer.Bytes()) == 0 {

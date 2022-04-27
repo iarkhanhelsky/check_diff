@@ -80,16 +80,16 @@ func TestFilter(t *testing.T) {
 
 		"excludes": {
 			settings: Settings{Exclude: []string{"gen/*"}},
-			ranges:   fromFiles("gen/a.go", "gen/b.go", "c.go"),
+			ranges:   fromFiles("gen/a", "gen/b.go", "c.go"),
 
 			expected: fromFiles("c.go"),
 		},
 
 		"includes": {
 			settings: Settings{Include: []string{"gen/*"}},
-			ranges:   fromFiles("gen/a.go", "gen/b.go", "c.go"),
+			ranges:   fromFiles("gen/a", "gen/b.go", "c.go"),
 
-			expected: fromFiles("gen/a.go", "gen/b.go"),
+			expected: fromFiles("gen/a", "gen/b.go"),
 		},
 	}
 

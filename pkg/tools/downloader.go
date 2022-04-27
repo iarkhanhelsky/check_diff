@@ -42,14 +42,18 @@ func (d *httpDownloader) Download(dstFolder string) error {
 
 func (d *httpDownloader) downloadFrom(url string, outputFile string) error {
 	resp, err := http.Get(url)
-	defer resp.Body.Close()
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
 
 	bytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return err
+	}
+
+	if resp.StatusCode >= 400 {
+		return fmt.Errorf("download error: %s", string(bytes))
 	}
 
 	if err := checkMD5(bytes, d.md5); err != nil {

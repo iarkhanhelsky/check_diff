@@ -1,62 +1,50 @@
 package tools
 
 import (
+	errs "errors"
+	"fmt"
+	"github.com/iarkhanhelsky/check_diff/pkg/executors"
 	"github.com/pkg/errors"
-	"go.uber.org/multierr"
 	"go.uber.org/zap"
 	"os"
 	"path"
 	"path/filepath"
-	"sync"
 )
 
 type Registry interface {
 	Install(binaries ...*Binary) error
 }
 
-func NewRegistry(logger *zap.SugaredLogger, vendorDir string) Registry {
+func NewRegistry(vendorDir string, logger *zap.SugaredLogger) Registry {
+	return newRegistry(vendorDir,
+		newUnpacker(logger.Named("unpacker")), logger)
+}
+
+func newRegistry(vendorDir string, unpacker unpacker, logger *zap.SugaredLogger) *registry {
 	return &registry{
 		logger:    logger.Named("registry"),
+		unpacker:  unpacker,
 		vendorDir: vendorDir,
 	}
 }
 
 type registry struct {
 	logger    *zap.SugaredLogger
+	unpacker  unpacker
 	vendorDir string
 }
 
 var _ Registry = &registry{}
 
 func (registry *registry) Install(binaries ...*Binary) error {
-	var wg sync.WaitGroup
-	wg.Add(len(binaries))
-	errchan := make(chan error)
-	done := make(chan bool)
-	for _, binary := range binaries {
-		bin := binary
-		go func() {
-			errchan <- registry.ensureBinary(bin)
-			wg.Done()
-		}()
+	executor := executors.NewParallel()
+	for _, b := range binaries {
+		bx := b
+		executor.Add(func() error {
+			return registry.ensureBinary(bx)
+		})
 	}
-
-	var err error
-	go func() {
-		for {
-			select {
-			case <-done:
-				return
-			case e := <-errchan:
-				err = multierr.Append(err, e)
-			}
-		}
-	}()
-
-	wg.Wait()
-	done <- true
-
-	return err
+	return executor.Run()
 }
 
 func (registry *registry) ensureBinary(binary *Binary) error {
@@ -101,7 +89,7 @@ install:
 func (registry registry) uptodate(binary *Binary) bool {
 	logger := registry.logger.With("binary", binary.Name)
 	logger.Debug("checking digest")
-	return newManifest(registry.binHome(binary), binary, registry.logger).isDiffer()
+	return !newManifest(registry.binHome(binary), binary, registry.logger).isDiffer()
 }
 
 func (registry registry) binHome(binary *Binary, other ...string) string {
@@ -115,7 +103,6 @@ func (registry registry) fetch(binary *Binary) error {
 	if err != nil {
 		return err
 	}
-	downloader := newHTTPDownloader(targetSource.MD5, targetSource.SHA256, targetSource.Urls...)
 
 	dstFolder := path.Join(registry.binHome(binary), "_dist")
 	logger.With("dist", dstFolder).Debug("create dist folder")
@@ -124,6 +111,7 @@ func (registry registry) fetch(binary *Binary) error {
 		return errors.Wrap(err, "failed to create dist")
 	}
 
+	downloader := newHTTPDownloader(targetSource.MD5, targetSource.SHA256, targetSource.Urls...)
 	if err := downloader.Download(dstFolder); err != nil {
 		logger.With("dist", dstFolder).With("err", err).Error("download failed")
 		return errors.Wrap(err, "download failed")
@@ -154,7 +142,7 @@ func (registry registry) fetch(binary *Binary) error {
 func (registry registry) unpack(binary *Binary) error {
 	logger := registry.logger.With("binary", binary.Name)
 	logger.Debug("unpacking binary")
-	return unpack{logger: logger, dir: registry.binHome(binary)}.unpackAll()
+	return registry.unpacker.unpackAll(registry.binHome(binary))
 }
 
 func (registry registry) writeManifest(binary *Binary) error {
@@ -167,6 +155,9 @@ func (registry registry) install(binary *Binary) error {
 	logger := registry.logger.With("binary", binary.Name)
 	logger.Debug("installing binary")
 	binary.executable = path.Join(registry.binHome(binary), binary.Path)
+	if _, err := os.Stat(binary.executable); errs.Is(err, os.ErrNotExist) {
+		return fmt.Errorf("unexpected %s: %w", binary.Name, err)
+	}
 	logger.With("executable", binary.executable).Debug("binary path updated")
 	return nil
 }
