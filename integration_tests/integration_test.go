@@ -39,13 +39,13 @@ func testCmd(t *testing.T, output []byte, args ...string) {
 	var errBuff bytes.Buffer
 
 	err := app.Main(command.Env{
-		Args:      args,
+		Args:      append(args, "--vendor-dir", t.TempDir()),
 		OutWriter: &outBuff,
 		ErrWriter: &errBuff,
 	})
 	assert.NoError(t, err)
+	assert.Equal(t, "", errBuff.String())
 	assert.Equal(t, string(output), outBuff.String())
-	assert.Len(t, errBuff.String(), 0)
 }
 
 func testCases(t *testing.T) []string {
