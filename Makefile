@@ -1,4 +1,8 @@
 test:
+	go test -v -covermode atomic -coverprofile=coverage.out ./pkg/...
+	go tool cover -html=coverage.out
+
+test_all:
 	go test -v -covermode atomic -coverprofile=coverage.out ./...
 	go tool cover -html=coverage.out
 

@@ -59,7 +59,7 @@ func TestParseArgs(t *testing.T) {
 				ConfigFile:  defaultConfigName,
 				FailOnError: true,
 
-				NoColor: true,
+				NoColor: func() *bool { x := true; return &x }(),
 			},
 		},
 	}

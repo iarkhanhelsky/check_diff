@@ -20,7 +20,7 @@ type CliOptions struct {
 	ConfigFile  string
 	VendorDir   string
 	FailOnError bool
-	NoColor     bool
+	NoColor     *bool
 	// Trace is not really used, but we generate flag for help entry
 	// --trace is checked in NewLogger function, as CliOptions can't be provided
 	// before Logger.
@@ -50,7 +50,15 @@ func (opts *CliOptions) parseArgs(args []string) error {
 
 	opts.FailOnError = !(*noFailOnError)
 	opts.Trace = *trace
-	opts.NoColor = *noColor
+
+	// Assign this value only if flag was set
+	for _, a := range args[1:] {
+		if a == "--no-color" {
+			opts.NoColor = noColor
+			break
+		}
+	}
+
 	opts.version = *version
 
 	return err

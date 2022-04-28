@@ -30,7 +30,7 @@ var Module = fx.Options(
 		command.NewCommand,
 	),
 	fx.Invoke(func(cfg core.Config) {
-		color.NoColor = !cfg.Color
+		color.NoColor = !cfg.WithColors()
 	}),
 )
 
@@ -56,6 +56,10 @@ func NewConfig(cliOpts CliOptions, yaml *config.YAML) (core.Config, error) {
 	}
 	if len(cliOpts.Format) != 0 {
 		cfg.OutputFormat = cliOpts.Format
+	}
+	if cliOpts.NoColor != nil {
+		v := !*cliOpts.NoColor
+		cfg.Color = &v
 	}
 
 	cfg.InputFile = cliOpts.InputFile

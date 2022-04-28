@@ -39,7 +39,7 @@ func testCmd(t *testing.T, output []byte, args ...string) {
 	var errBuff bytes.Buffer
 
 	err := app.Main(command.Env{
-		Args:      append(args, "--vendor-dir", t.TempDir()),
+		Args:      append(args, "--vendor-dir", t.TempDir(), "--no-color"),
 		OutWriter: &outBuff,
 		ErrWriter: &errBuff,
 	})
