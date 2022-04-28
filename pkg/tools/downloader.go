@@ -41,6 +41,10 @@ func (d *httpDownloader) Download(dstFolder string) error {
 }
 
 func (d *httpDownloader) downloadFrom(url string, outputFile string) error {
+	if d.isUptodate(outputFile) {
+		return nil
+	}
+
 	resp, err := http.Get(url)
 	if err != nil {
 		return err
@@ -71,10 +75,6 @@ func (d *httpDownloader) downloadFrom(url string, outputFile string) error {
 	return nil
 }
 
-func (d *httpDownloader) ensurePath() (string, error) {
-	return "", nil
-}
-
 func checkMD5(bytes []byte, md5sum string) error {
 	// "" means skip
 	if len(md5sum) == 0 {
@@ -97,7 +97,7 @@ func checkSHA256(bytes []byte, sha1sum string) error {
 
 	hex := fmt.Sprintf("%x", sha256.Sum256(bytes))
 	if hex != sha1sum {
-		return errors.New("sha1sum mismatch")
+		return errors.New("sha256sum mismatch")
 	}
 
 	return nil
