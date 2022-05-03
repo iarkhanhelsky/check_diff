@@ -128,11 +128,14 @@ func (registry registry) fetch(binary *Binary) error {
 		target := path.Join(registry.binHome(binary), fileName)
 		if _, err := os.Stat(target); err == nil {
 			logger.With("source", file).With("target", target).Debug("exists removing")
-			continue
+			if err := os.Remove(target); err != nil {
+				logger.With("source", file).With("target", target).Error(err.Error())
+				return fmt.Errorf("failed to remove %s: %w", target, err)
+			}
 		}
 		logger.With("source", file).With("target", target).Debug("create symlink")
 		if err := os.Symlink(source, target); err != nil {
-			return errors.Wrap(err, "failed to create symlink")
+			return fmt.Errorf("failed to create symlink: %w", err)
 		}
 	}
 
