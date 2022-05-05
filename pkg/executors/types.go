@@ -12,5 +12,5 @@ func NewParallel() Executor {
 }
 
 func NewSequential() Executor {
-	return &Parallel{}
+	return &Sequential{}
 }
