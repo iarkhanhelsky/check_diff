@@ -4,3 +4,4 @@ target/
 dist/
 coverage.html
 coverage.out
+mocks/*

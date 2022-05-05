@@ -41,12 +41,19 @@ func WithShellOptions(opts ...ShellOption) FlowOption {
 	}
 }
 
+func withShellFactory(factory func(...ShellOption) Shell) FlowOption {
+	return func(f *flow) {
+		f.shellFactory = factory
+	}
+}
+
 func NewFlow(tag string, s Settings, opts ...FlowOption) Flow {
 	f := flow{
 		tag:          tag,
 		settings:     s,
 		argFunction:  DefaultArgFunction,
 		shellOptions: []ShellOption{AllowExitCodes(0, 1)},
+		shellFactory: NewLocalShell,
 	}
 	for _, o := range opts {
 		o(&f)
@@ -64,6 +71,7 @@ type flow struct {
 	shellOptions        []ShellOption
 	converter           Converter
 	supportedExtensions []string
+	shellFactory        func(opts ...ShellOption) Shell
 }
 
 var _ Flow = &flow{}
@@ -79,7 +87,7 @@ func (f *flow) Run(ranges []LineRange) ([]Issue, error) {
 		args = append(args, f.argFunction(r)...)
 	}
 
-	output, err := NewLocalShell(f.shellOptions...).Execute(f.command, args...)
+	output, err := f.shellFactory(f.shellOptions...).Execute(f.command, args...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute %s issues: %v", f.tag, err)
 	}
