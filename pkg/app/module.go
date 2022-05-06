@@ -8,6 +8,7 @@ import (
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
 	"github.com/iarkhanhelsky/check_diff/pkg/formatter"
 	"github.com/iarkhanhelsky/check_diff/pkg/tools"
+	"github.com/iarkhanhelsky/check_diff/pkg/unpack"
 	"go.uber.org/config"
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxevent"
@@ -18,6 +19,7 @@ var Module = fx.Options(
 	checker.Module,
 	formatter.Module,
 	tools.Module,
+	unpack.Module,
 	fx.WithLogger(func() fxevent.Logger { return fxevent.NopLogger }),
 	fx.Provide(
 		NewCliOptions,
@@ -38,8 +40,11 @@ func NewFormatterParams(config core.Config) formatter.Params {
 	return formatter.Params{Format: config.OutputFormat}
 }
 
-func NewToolsParams(config core.Config, logger *zap.SugaredLogger) tools.Params {
-	return tools.Params{VendorDir: config.VendorDir, Logger: logger}
+func NewToolsParams(config core.Config, unpacker unpack.Unpacker, logger *zap.SugaredLogger) tools.Params {
+	return tools.Params{
+		VendorDir: config.VendorDir,
+		Unpacker:  unpacker,
+		Logger:    logger}
 }
 
 func NewConfig(cliOpts CliOptions, yaml *config.YAML) (core.Config, error) {
