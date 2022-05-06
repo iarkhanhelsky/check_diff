@@ -4,6 +4,7 @@ import (
 	errs "errors"
 	"fmt"
 	"github.com/iarkhanhelsky/check_diff/pkg/executors"
+	"github.com/iarkhanhelsky/check_diff/pkg/unpack"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	"os"
@@ -15,12 +16,7 @@ type Registry interface {
 	Install(binaries ...*Binary) error
 }
 
-func NewRegistry(vendorDir string, logger *zap.SugaredLogger) Registry {
-	return newRegistry(vendorDir,
-		newUnpacker(logger.Named("unpacker")), logger)
-}
-
-func newRegistry(vendorDir string, unpacker unpacker, logger *zap.SugaredLogger) *registry {
+func NewRegistry(vendorDir string, unpacker unpack.Unpacker, logger *zap.SugaredLogger) *registry {
 	return &registry{
 		logger:    logger.Named("registry"),
 		unpacker:  unpacker,
@@ -30,7 +26,7 @@ func newRegistry(vendorDir string, unpacker unpacker, logger *zap.SugaredLogger)
 
 type registry struct {
 	logger    *zap.SugaredLogger
-	unpacker  unpacker
+	unpacker  unpack.Unpacker
 	vendorDir string
 }
 
@@ -145,7 +141,7 @@ func (registry registry) fetch(binary *Binary) error {
 func (registry registry) unpack(binary *Binary) error {
 	logger := registry.logger.With("binary", binary.Name)
 	logger.Debug("unpacking binary")
-	return registry.unpacker.unpackAll(registry.binHome(binary))
+	return registry.unpacker.UnpackAll(registry.binHome(binary))
 }
 
 func (registry registry) writeManifest(binary *Binary) error {

@@ -3,6 +3,7 @@ package tools
 import (
 	"crypto/md5"
 	"fmt"
+	"github.com/iarkhanhelsky/check_diff/pkg/unpack"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
 	"io/ioutil"
@@ -15,7 +16,7 @@ import (
 
 func TestRegistry_Install(t *testing.T) {
 	assert := assert.New(t)
-	r := newRegistry(t.TempDir(), &noopUnpacker{}, zap.NewNop().Sugar())
+	r := NewRegistry(t.TempDir(), unpack.NoopUnpacker(), zap.NewNop().Sugar())
 
 	var handler http.HandlerFunc = func(writer http.ResponseWriter, request *http.Request) {
 		writer.Write([]byte("abc"))
@@ -39,7 +40,7 @@ func TestRegistry_Install(t *testing.T) {
 
 func TestRegistry_install(t *testing.T) {
 	assert := assert.New(t)
-	r := newRegistry("test", &noopUnpacker{}, zap.NewNop().Sugar())
+	r := NewRegistry("test", unpack.NoopUnpacker(), zap.NewNop().Sugar())
 	b := &Binary{Name: "foo", Path: "bar"}
 	r.install(b)
 	assert.Equal(b.executable, "test/foo/bar")
@@ -47,7 +48,7 @@ func TestRegistry_install(t *testing.T) {
 
 func TestRegistry_binHome(t *testing.T) {
 	assert := assert.New(t)
-	r := newRegistry("test", &noopUnpacker{}, zap.NewNop().Sugar())
+	r := NewRegistry("test", unpack.NoopUnpacker(), zap.NewNop().Sugar())
 	assert.Equal(r.binHome(&Binary{Name: "foo"}), "test/foo")
 	assert.Equal(r.binHome(&Binary{Name: "foo"}, "bar"), "test/foo/bar")
 }
@@ -181,7 +182,7 @@ func TestRegistry_ensureBinary(t *testing.T) {
 			assert := assert.New(t)
 
 			vendorDir := t.TempDir()
-			registry := newRegistry(vendorDir, &noopUnpacker{}, zap.NewNop().Sugar())
+			registry := NewRegistry(vendorDir, unpack.NoopUnpacker(), zap.NewNop().Sugar())
 
 			ts := httptest.NewServer(tc.remoteHandler)
 			defer ts.Close()

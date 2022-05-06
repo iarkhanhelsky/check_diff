@@ -1,4 +1,4 @@
-package tools
+package unpack
 
 import (
 	"context"
@@ -11,40 +11,44 @@ import (
 	"path/filepath"
 )
 
-type unpacker interface {
-	unpackAll(dir string) error
+type Unpacker interface {
+	UnpackAll(dir string) error
 }
 
 // for tests only
-var _ unpacker = &noopUnpacker{}
+var _ Unpacker = &noopUnpacker{}
 
-var _ unpacker = &compositeUnpacker{}
-var _ unpacker = &unzip{}
+var _ Unpacker = &compositeUnpacker{}
+var _ Unpacker = &unzip{}
 
 type noopUnpacker struct {
 }
 
-func (*noopUnpacker) unpackAll(dir string) error {
+func NoopUnpacker() Unpacker {
+	return &noopUnpacker{}
+}
+
+func (*noopUnpacker) UnpackAll(dir string) error {
 	return nil
 }
 
 type compositeUnpacker struct {
-	unpackers []unpacker
+	unpackers []Unpacker
 	logger    zap.Logger
 }
 
-func newUnpacker(logger *zap.SugaredLogger) unpacker {
+func NewUnpacker(logger *zap.SugaredLogger) Unpacker {
 	return &compositeUnpacker{
-		unpackers: []unpacker{
+		unpackers: []Unpacker{
 			&unzip{logger: logger},
 		},
 	}
 }
 
-func (c compositeUnpacker) unpackAll(dir string) error {
+func (c compositeUnpacker) UnpackAll(dir string) error {
 	var err error
 	for _, u := range c.unpackers {
-		err = multierr.Append(err, u.unpackAll(dir))
+		err = multierr.Append(err, u.UnpackAll(dir))
 	}
 
 	return err
@@ -55,7 +59,7 @@ type unzip struct {
 	dir    string
 }
 
-func (unpack *unzip) unpackAll(dir string) error {
+func (unpack *unzip) UnpackAll(dir string) error {
 	files, _ := filepath.Glob(path.Join(dir, "*.zip"))
 	for _, file := range files {
 		if err := unzipArchive(file, dir); err != nil {
