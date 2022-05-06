@@ -4,7 +4,12 @@ mocks/mock_shell.go: pkg/core/shell.go
                -package=mocks \
                github.com/iarkhanhelsky/check_diff/pkg/core Shell
 
-mockgen: mocks/mock_shell.go
+mocks/mock_unpacker.go: pkg/unpack/unpack.go
+	${MOCKGEN} -destination=mocks/mock_unpacker.go \
+               -package=mocks \
+               github.com/iarkhanhelsky/check_diff/pkg/unpack Unpacker
+
+mockgen: mocks/mock_shell.go mocks/mock_unpacker.go
 
 test: mockgen
 	go test -v -covermode atomic -coverprofile=coverage.out ./pkg/...
