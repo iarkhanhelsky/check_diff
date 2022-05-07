@@ -34,9 +34,14 @@ page and copy them to the desired location.
 
 ## Builtin linter bindings
 
-| Language | Linter      | Version  |
-|----------|-------------|----------|
-| Java     | Checkstyle  | 9.3      |
-| K8S      | kube-linter | 0.2.5    |
-| Ruby     | rubocop     | 1.25.1   |
+| Language | Linter                                              | Bundled Version |
+|----------|-----------------------------------------------------|----------------|
+| Java     | [Checkstyle](pkg/checker/java/checkstyle/Readme.md) | 9.3            |
+| K8S      | [kube-linter](pkg/checker/k8s/kubelinter/Readme.md) | 0.2.5          |
+| Ruby     | [rubocop](pkg/checker/ruby/rubocop/Readme.md)       |                |
  
+## Output formats
+
+* STDOUT - print lint issues in human-readable format
+* Phabricator
+* [Codeclimate](https://github.com/codeclimate/platform/blob/master/spec/analyzers/SPEC.md) 
