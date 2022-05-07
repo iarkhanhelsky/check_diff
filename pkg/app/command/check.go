@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/iarkhanhelsky/check_diff/pkg/tools"
-	"github.com/pkg/errors"
 	"io"
 	"os"
 	"time"
@@ -37,12 +36,12 @@ func NewCheck(env Env, config core.Config, checkers []core.Checker, logger *zap.
 func (check *Check) Run() error {
 	var err error
 	if err = check.download(); err != nil {
-		return fmt.Errorf("failed to download dependencies: %v", err)
+		return fmt.Errorf("downloading dependencies: %v", err)
 	}
 
 	var ranges []core.LineRange
 	if ranges, err = check.readDiff(); err != nil {
-		return fmt.Errorf("failed to download dependencies: %v", err)
+		return fmt.Errorf("reading diff: %v", err)
 	}
 
 	issues, err := check.runChecks(ranges)
@@ -82,7 +81,7 @@ func (check *Check) readDiff() ([]core.LineRange, error) {
 func (check *Check) download() error {
 	err := os.MkdirAll(check.Config.VendorDir, 0755)
 	if err != nil {
-		return errors.Wrap(err, "failed to download binaries")
+		return fmt.Errorf("preparing vendor dir %s: %w", check.Config.VendorDir, err)
 	}
 
 	var binaries []*tools.Binary
