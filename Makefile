@@ -11,9 +11,9 @@ mock_clean:
 	find mocks -name '*_mock.go' -exec rm {} \;
 
 mockgen: mock_clean \
-		 mocks/pkg/core/shell_mock.go \
 		 mocks/pkg/core/checker_mock.go \
-         mocks/pkg/unpack/unpacker_mock.go \
+		 mocks/pkg/unpack/unpacker_mock.go \
+		 mocks/pkg/shell/shell_mock.go \
          mocks/pkg/tools/registry_mock.go \
 
 test: mockgen

@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"github.com/iarkhanhelsky/check_diff/pkg/shell"
 )
 
 type Flow interface {
@@ -35,13 +36,13 @@ func WithFileExtensions(exts ...string) FlowOption {
 	}
 }
 
-func WithShellOptions(opts ...ShellOption) FlowOption {
+func WithShellOptions(opts ...shell.ShellOption) FlowOption {
 	return func(f *flow) {
 		f.shellOptions = opts
 	}
 }
 
-func WithShellFactory(factory func(...ShellOption) Shell) FlowOption {
+func WithShellFactory(factory func(...shell.ShellOption) shell.Shell) FlowOption {
 	return func(f *flow) {
 		f.shellFactory = factory
 	}
@@ -52,8 +53,8 @@ func NewFlow(tag string, s Settings, opts ...FlowOption) Flow {
 		tag:          tag,
 		settings:     s,
 		argFunction:  DefaultArgFunction,
-		shellOptions: []ShellOption{AllowExitCodes(0, 1)},
-		shellFactory: NewLocalShell,
+		shellOptions: []shell.ShellOption{shell.AllowExitCodes(0, 1)},
+		shellFactory: shell.NewLocalShell,
 	}
 	for _, o := range opts {
 		o(&f)
@@ -68,10 +69,10 @@ type flow struct {
 	command             string
 	args                []string
 	argFunction         ArgFunction
-	shellOptions        []ShellOption
+	shellOptions        []shell.ShellOption
 	converter           Converter
 	supportedExtensions []string
-	shellFactory        func(opts ...ShellOption) Shell
+	shellFactory        func(opts ...shell.ShellOption) shell.Shell
 }
 
 var _ Flow = &flow{}
