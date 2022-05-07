@@ -1,6 +1,7 @@
 package unpack_test
 
 import (
+	"fmt"
 	"github.com/golang/mock/gomock"
 	unpackmocks "github.com/iarkhanhelsky/check_diff/mocks/pkg/unpack"
 	"github.com/iarkhanhelsky/check_diff/pkg/unpack"
@@ -9,7 +10,6 @@ import (
 	"go.uber.org/zap"
 	"os/exec"
 	"path"
-	"path/filepath"
 	"runtime"
 	"testing"
 )
@@ -36,16 +36,39 @@ func TestCompositeUnpacker_UnpackAll(t *testing.T) {
 func TestNewUnpacker(t *testing.T) {
 	assert := assert.New(t)
 
-	unpacker := unpack.NewUnpacker(zap.NewNop().Sugar())
-	tempDir := t.TempDir()
-	files, err := filepath.Glob("testdata/*")
-	assert.NoError(err)
-	for _, file := range files {
-		cp(t, file, path.Join(tempDir, path.Base(file)))
+	testCases := map[string]struct {
+		files       []string
+		expectFiles []string
+		errf        string
+	}{
+		"a.zip": {
+			files:       []string{"testdata/a.zip"},
+			expectFiles: []string{"a.txt"},
+		},
+		"notzip.zip": {
+			files: []string{"testdata/notzip.zip"},
+			errf:  "unpacking %s/notzip.zip: zip: not a valid zip file",
+		},
 	}
 
-	assert.NoError(unpacker.UnpackAll(tempDir))
-	assert.FileExists(path.Join(tempDir, "a.txt"))
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			unpacker := unpack.NewUnpacker(zap.NewNop().Sugar())
+			tempDir := t.TempDir()
+			for _, file := range tc.files {
+				cp(t, file, path.Join(tempDir, path.Base(file)))
+			}
+
+			if err := unpacker.UnpackAll(tempDir); tc.errf == "" {
+				assert.NoError(err)
+				for _, expect := range tc.expectFiles {
+					assert.FileExists(path.Join(tempDir, expect))
+				}
+			} else {
+				assert.EqualError(err, fmt.Sprintf(tc.errf, tempDir))
+			}
+		})
+	}
 }
 
 func cp(t *testing.T, src string, dst string) {
