@@ -41,7 +41,7 @@ func WithShellOptions(opts ...ShellOption) FlowOption {
 	}
 }
 
-func withShellFactory(factory func(...ShellOption) Shell) FlowOption {
+func WithShellFactory(factory func(...ShellOption) Shell) FlowOption {
 	return func(f *flow) {
 		f.shellFactory = factory
 	}

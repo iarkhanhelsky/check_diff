@@ -1,8 +1,9 @@
-package core
+package core_test
 
 import (
 	"github.com/golang/mock/gomock"
-	"github.com/iarkhanhelsky/check_diff/mocks"
+	mockcore "github.com/iarkhanhelsky/check_diff/mocks/pkg/core"
+	"github.com/iarkhanhelsky/check_diff/pkg/core"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -10,39 +11,39 @@ import (
 
 func TestFlow_Run(t *testing.T) {
 	testCases := map[string]struct {
-		flowOpts   []FlowOption
-		ranges     []LineRange
-		settings   Settings
-		shellSetup func(shell *mocks.MockShell)
+		flowOpts   []core.FlowOption
+		ranges     []core.LineRange
+		settings   core.Settings
+		shellSetup func(shell *mockcore.MockShell)
 
 		err      string
-		expected []Issue
+		expected []core.Issue
 	}{
 		"empty line range": {
-			ranges:   []LineRange{},
-			expected: []Issue{},
+			ranges:   []core.LineRange{},
+			expected: []core.Issue{},
 		},
 		"no matching files": {
-			ranges: []LineRange{
+			ranges: []core.LineRange{
 				{File: "a.cpp", Start: 1, End: 2},
 			},
-			flowOpts: []FlowOption{
-				WithFileExtensions(".txt"),
+			flowOpts: []core.FlowOption{
+				core.WithFileExtensions(".txt"),
 			},
-			expected: []Issue{},
+			expected: []core.Issue{},
 		},
 		"cmd error": {
-			ranges: []LineRange{
+			ranges: []core.LineRange{
 				{File: "a.txt", Start: 1, End: 2},
 				{File: "b.txt", Start: 3, End: 5},
 			},
-			flowOpts: []FlowOption{
-				WithFileExtensions(".txt"),
+			flowOpts: []core.FlowOption{
+				core.WithFileExtensions(".txt"),
 			},
-			settings: Settings{
+			settings: core.Settings{
 				Command: "test-lint",
 			},
-			shellSetup: func(shell *mocks.MockShell) {
+			shellSetup: func(shell *mockcore.MockShell) {
 				shell.EXPECT().Execute("test-lint", "a.txt", "b.txt").
 					Return(nil, errors.New("cmd failed"))
 			},
@@ -50,32 +51,32 @@ func TestFlow_Run(t *testing.T) {
 			err: "failed to execute test issues: cmd failed",
 		},
 		"with command": {
-			ranges: []LineRange{
+			ranges: []core.LineRange{
 				{File: "a.txt", Start: 1, End: 2},
 				{File: "b.txt", Start: 3, End: 5},
 			},
-			flowOpts: []FlowOption{
-				WithFileExtensions(".txt"),
-				WithCommand("test-lint-v2"),
+			flowOpts: []core.FlowOption{
+				core.WithFileExtensions(".txt"),
+				core.WithCommand("test-lint-v2"),
 			},
-			shellSetup: func(shell *mocks.MockShell) {
+			shellSetup: func(shell *mockcore.MockShell) {
 				shell.EXPECT().Execute("test-lint-v2", "a.txt", "b.txt").
 					Return([]byte{}, nil)
 			},
 
-			expected: []Issue{},
+			expected: []core.Issue{},
 		},
 		"convert error": {
-			ranges: []LineRange{
+			ranges: []core.LineRange{
 				{File: "a.txt", Start: 1, End: 2},
 			},
-			flowOpts: []FlowOption{
-				WithFileExtensions(".txt"),
-				WithConverter(func(bytes []byte) ([]Issue, error) {
-					return []Issue{}, errors.New("convert failed")
+			flowOpts: []core.FlowOption{
+				core.WithFileExtensions(".txt"),
+				core.WithConverter(func(bytes []byte) ([]core.Issue, error) {
+					return []core.Issue{}, errors.New("convert failed")
 				}),
 			},
-			shellSetup: func(shell *mocks.MockShell) {
+			shellSetup: func(shell *mockcore.MockShell) {
 				shell.EXPECT().Execute("test-lint", "a.txt").
 					Return([]byte{}, nil)
 			},
@@ -83,43 +84,43 @@ func TestFlow_Run(t *testing.T) {
 			err: "failed to convert test issues: convert failed",
 		},
 		"no matching issues": {
-			ranges: []LineRange{
+			ranges: []core.LineRange{
 				{File: "a.txt", Start: 1, End: 2},
 			},
-			flowOpts: []FlowOption{
-				WithFileExtensions(".txt"),
-				WithConverter(func(bytes []byte) ([]Issue, error) {
-					return []Issue{
+			flowOpts: []core.FlowOption{
+				core.WithFileExtensions(".txt"),
+				core.WithConverter(func(bytes []byte) ([]core.Issue, error) {
+					return []core.Issue{
 						{Line: 10, File: "a.txt"},
 					}, nil
 				}),
 			},
-			shellSetup: func(shell *mocks.MockShell) {
+			shellSetup: func(shell *mockcore.MockShell) {
 				shell.EXPECT().Execute("test-lint", "a.txt").
 					Return([]byte{}, nil)
 			},
 
-			expected: []Issue{},
+			expected: []core.Issue{},
 		},
 		"filter issues": {
-			ranges: []LineRange{
+			ranges: []core.LineRange{
 				{File: "a.txt", Start: 1, End: 5},
 			},
-			flowOpts: []FlowOption{
-				WithFileExtensions(".txt"),
-				WithConverter(func(bytes []byte) ([]Issue, error) {
-					return []Issue{
+			flowOpts: []core.FlowOption{
+				core.WithFileExtensions(".txt"),
+				core.WithConverter(func(bytes []byte) ([]core.Issue, error) {
+					return []core.Issue{
 						{Line: 1, File: "a.txt"},
 						{Line: 10, File: "a.txt"},
 					}, nil
 				}),
 			},
-			shellSetup: func(shell *mocks.MockShell) {
+			shellSetup: func(shell *mockcore.MockShell) {
 				shell.EXPECT().Execute("test-lint", "a.txt").
 					Return([]byte{}, nil)
 			},
 
-			expected: []Issue{
+			expected: []core.Issue{
 				{Line: 1, File: "a.txt"},
 			},
 		},
@@ -132,21 +133,21 @@ func TestFlow_Run(t *testing.T) {
 
 			// Build test defaults, everything can be overriden by
 			// tc.flowOpts
-			opts := []FlowOption{
-				WithConverter(func(bytes []byte) ([]Issue, error) {
-					return []Issue{}, nil
+			opts := []core.FlowOption{
+				core.WithConverter(func(bytes []byte) ([]core.Issue, error) {
+					return []core.Issue{}, nil
 				}),
-				WithCommand("test-lint"),
+				core.WithCommand("test-lint"),
 			}
 			opts = append(opts, tc.flowOpts...)
-			opts = append(opts, withShellFactory(func(option ...ShellOption) Shell {
-				shell := mocks.NewMockShell(ctrl)
+			opts = append(opts, core.WithShellFactory(func(option ...core.ShellOption) core.Shell {
+				shell := mockcore.NewMockShell(ctrl)
 				assert.NotNil(tc.shellSetup)
 				tc.shellSetup(shell)
 				return shell
 			}))
 
-			flow := NewFlow("test", tc.settings, opts...)
+			flow := core.NewFlow("test", tc.settings, opts...)
 			result, err := flow.Run(tc.ranges)
 			if tc.err != "" {
 				assert.EqualError(err, tc.err)

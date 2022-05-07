@@ -18,7 +18,7 @@ type Unpacker interface {
 // for tests only
 var _ Unpacker = &noopUnpacker{}
 
-var _ Unpacker = &compositeUnpacker{}
+var _ Unpacker = &CompositeUnpacker{}
 var _ Unpacker = &unzip{}
 
 type noopUnpacker struct {
@@ -32,22 +32,22 @@ func (*noopUnpacker) UnpackAll(dir string) error {
 	return nil
 }
 
-type compositeUnpacker struct {
-	unpackers []Unpacker
+type CompositeUnpacker struct {
+	Unpackers []Unpacker
 	logger    zap.Logger
 }
 
 func NewUnpacker(logger *zap.SugaredLogger) Unpacker {
-	return &compositeUnpacker{
-		unpackers: []Unpacker{
+	return &CompositeUnpacker{
+		Unpackers: []Unpacker{
 			&unzip{logger: logger},
 		},
 	}
 }
 
-func (c compositeUnpacker) UnpackAll(dir string) error {
+func (c CompositeUnpacker) UnpackAll(dir string) error {
 	var err error
-	for _, u := range c.unpackers {
+	for _, u := range c.Unpackers {
 		err = multierr.Append(err, u.UnpackAll(dir))
 	}
 

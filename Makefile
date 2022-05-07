@@ -1,15 +1,20 @@
 MOCKGEN=go run github.com/golang/mock/mockgen
-mocks/mock_shell.go: pkg/core/shell.go
-	${MOCKGEN} -destination=mocks/mock_shell.go \
-               -package=mocks \
-               github.com/iarkhanhelsky/check_diff/pkg/core Shell
 
-mocks/mock_unpacker.go: pkg/unpack/unpack.go
-	${MOCKGEN} -destination=mocks/mock_unpacker.go \
-               -package=mocks \
-               github.com/iarkhanhelsky/check_diff/pkg/unpack Unpacker
+mocks/%_mock.go: $(wildcard $(dir %)/*.go)
+	${MOCKGEN} \
+ 		-destination=$@ \
+        -package=mocks \
+        $(shell echo github.com/iarkhanhelsky/check_diff/$(subst mocks/,,$(dir $@)) | ruby -e 'puts gets[0...-2]' ) \
+        $(shell echo $(subst _mock,,$(basename $(notdir $@))) |  ruby -e 'puts gets.capitalize')
 
-mockgen: mocks/mock_shell.go mocks/mock_unpacker.go
+mock_clean:
+	find mocks -name '*_mock.go' -exec rm {} \;
+
+mockgen: mock_clean \
+		 mocks/pkg/core/shell_mock.go \
+		 mocks/pkg/core/checker_mock.go \
+         mocks/pkg/unpack/unpacker_mock.go \
+         mocks/pkg/tools/registry_mock.go \
 
 test: mockgen
 	go test -v -covermode atomic -coverprofile=coverage.out ./pkg/...

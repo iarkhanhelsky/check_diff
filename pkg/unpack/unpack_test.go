@@ -1,8 +1,9 @@
-package unpack
+package unpack_test
 
 import (
 	"github.com/golang/mock/gomock"
-	"github.com/iarkhanhelsky/check_diff/mocks"
+	unpackmocks "github.com/iarkhanhelsky/check_diff/mocks/pkg/unpack"
+	"github.com/iarkhanhelsky/check_diff/pkg/unpack"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
@@ -16,26 +17,26 @@ import (
 func TestCompositeUnpacker_UnpackAll(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	assert := assert.New(t)
-	unpackers := []Unpacker{}
+	unpackers := []unpack.Unpacker{}
 	for i := 0; i < 3; i++ {
-		u := mocks.NewMockUnpacker(ctrl)
+		u := unpackmocks.NewMockUnpacker(ctrl)
 		u.EXPECT().UnpackAll("test/")
 		unpackers = append(unpackers, u)
 	}
-	unpacker := &compositeUnpacker{unpackers: unpackers}
+	unpacker := &unpack.CompositeUnpacker{Unpackers: unpackers}
 	assert.NoError(unpacker.UnpackAll("test/"))
 
-	errUnpacker := mocks.NewMockUnpacker(ctrl)
+	errUnpacker := unpackmocks.NewMockUnpacker(ctrl)
 	errUnpacker.EXPECT().UnpackAll("test/").Return(errors.New("fail"))
 
-	unpacker = &compositeUnpacker{unpackers: []Unpacker{errUnpacker}}
+	unpacker = &unpack.CompositeUnpacker{Unpackers: []unpack.Unpacker{errUnpacker}}
 	assert.EqualError(unpacker.UnpackAll("test/"), "fail")
 }
 
 func TestNewUnpacker(t *testing.T) {
 	assert := assert.New(t)
 
-	unpacker := NewUnpacker(zap.NewNop().Sugar())
+	unpacker := unpack.NewUnpacker(zap.NewNop().Sugar())
 	tempDir := t.TempDir()
 	files, err := filepath.Glob("testdata/*")
 	assert.NoError(err)
