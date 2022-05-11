@@ -25,11 +25,6 @@ jobs:
     - name: Set up gems
       run: cd integration_tests && bundle install
 
-    - name: go mod tidy
-      run: |
-        go mod tidy
-        git diff
-
     - name: Build
       run: make build
 
@@ -46,3 +41,9 @@ jobs:
       env:
         COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: goveralls -coverprofile=covprofile -service=github
+
+    - name: go mod tidy
+      run: |
+        go mod tidy
+        git diff
+

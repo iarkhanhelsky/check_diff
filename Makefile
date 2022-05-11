@@ -8,6 +8,7 @@ mocks/%_mock.go: $(wildcard $(dir %)/*.go)
         $(shell echo $(subst _mock,,$(basename $(notdir $@))) |  ruby -e 'puts gets.capitalize')
 
 mock_clean:
+	mkdir -p mocks
 	find mocks -name '*_mock.go' -exec rm {} \;
 
 mockgen: mock_clean \
