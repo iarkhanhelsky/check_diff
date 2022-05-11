@@ -25,6 +25,11 @@ jobs:
     - name: Set up gems
       run: cd integration_tests && bundle install
 
+    - name: go mod tidy
+      run: |
+        go mod tidy
+        git diff
+
     - name: Build
       run: make build
 
