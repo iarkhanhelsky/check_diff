@@ -34,11 +34,11 @@ page and copy them to the desired location.
 
 ## Builtin linter bindings
 
-| Language | Linter                                              | Bundled Version |
-|----------|-----------------------------------------------------|----------------|
-| Java     | [Checkstyle](pkg/checker/java/checkstyle/Readme.md) | 9.3            |
-| K8S      | [kube-linter](pkg/checker/k8s/kubelinter/Readme.md) | 0.2.5          |
-| Ruby     | [rubocop](pkg/checker/ruby/rubocop/Readme.md)       |                |
+| Language | Linter                                              | Bundled Version | Tested With  |
+|----------|-----------------------------------------------------|-----------------|--------------|
+| Java     | [Checkstyle](pkg/checker/java/checkstyle/Readme.md) | 9.3             | -//-         |
+| K8S      | [kube-linter](pkg/checker/k8s/kubelinter/Readme.md) | 0.2.5           | -//-         |
+| Ruby     | [rubocop](pkg/checker/ruby/rubocop/Readme.md)       |                 | 1.25.1       |
  
 ## Output formats
 
