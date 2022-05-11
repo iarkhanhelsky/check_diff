@@ -1,1 +1,1 @@
-[{"description":"x declared but not used","fingerprint":"2b47f896ac9ff6b8d8d97013f012bb30","severity":"error","location":{"path":"golang/main.go","lines":{"begin":4}}}]
+[{"description":"x declared but not used","fingerprint":"0af33c9bae8aef73c3c670dbc6cc56aa","severity":"error","location":{"path":"golang/main.go","lines":{"begin":6}}}]
