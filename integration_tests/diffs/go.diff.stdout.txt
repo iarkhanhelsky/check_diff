@@ -1,0 +1,12 @@
+golang/main.go:6:6
+[error] x declared but not used
+ 1: //go:build exclude
+ 2:
+ 3: package main
+ 4:
+ 5: func main() {
+ 6: 	var x = 2
+         ^
+ 7: }
+
+Total: 1 in 1 files

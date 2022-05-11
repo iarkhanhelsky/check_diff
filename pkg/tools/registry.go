@@ -157,6 +157,9 @@ func (registry registry) install(binary *Binary) error {
 	if _, err := os.Stat(binary.executable); errs.Is(err, os.ErrNotExist) {
 		return fmt.Errorf("unexpected %s: %w", binary.Name, err)
 	}
+	if err := os.Chmod(binary.executable, 0755); err != nil {
+		return fmt.Errorf("chmod +x: %s: %w", binary.executable, err)
+	}
 	logger.With("executable", binary.executable).Debug("binary path updated")
 	return nil
 }

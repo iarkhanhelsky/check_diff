@@ -2,6 +2,7 @@ package checker
 
 import (
 	"fmt"
+	golangci_lint "github.com/iarkhanhelsky/check_diff/pkg/checker/golang/golangci-lint"
 	"github.com/iarkhanhelsky/check_diff/pkg/checker/java/checkstyle"
 	"github.com/iarkhanhelsky/check_diff/pkg/checker/k8s/kubelinter"
 	"github.com/iarkhanhelsky/check_diff/pkg/checker/ruby/rubocop"
@@ -26,6 +27,7 @@ var Module = ProvideCheckers(
 	kubelinter.NewChecker(),
 	checkstyle.NewChecker(),
 	rubocop.NewChecker(),
+	golangci_lint.NewChecker(),
 )
 
 func ProvideCheckers(checkers ...core.Checker) fx.Option {
