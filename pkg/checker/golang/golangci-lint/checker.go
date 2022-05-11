@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/iarkhanhelsky/check_diff/pkg/core"
 	"github.com/iarkhanhelsky/check_diff/pkg/tools"
+	"runtime"
 	"strings"
 )
 
@@ -27,7 +28,9 @@ func NewChecker() core.Checker {
 		golangciLint: &tools.Binary{
 			Name:    "golangci-lint",
 			DstFile: "golangci-lint.tar.gz",
-			Path:    strings.ReplaceAll("golangci-lint-@VERSION-darwin-arm64/golangci-lint", "@VERSION", golangciLintVersion),
+			Path: strings.ReplaceAll(
+				fmt.Sprintf("golangci-lint-@VERSION-%s-%s/golangci-lint", runtime.GOOS, runtime.GOARCH),
+				"@VERSION", golangciLintVersion),
 			Targets: map[tools.TargetTuple]tools.TargetSource{
 				tools.DarwinAMD64: {
 					Urls: []string{strings.ReplaceAll(
