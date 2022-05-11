@@ -1,14 +1,8 @@
 package unpack
 
 import (
-	"context"
-	"fmt"
-	"github.com/saracen/fastzip"
 	"go.uber.org/multierr"
 	"go.uber.org/zap"
-	"os"
-	"path"
-	"path/filepath"
 )
 
 type Unpacker interface {
@@ -41,6 +35,7 @@ func NewUnpacker(logger *zap.SugaredLogger) Unpacker {
 	return &CompositeUnpacker{
 		Unpackers: []Unpacker{
 			&unzip{logger: logger},
+			&untar{logger: logger},
 		},
 	}
 }
@@ -52,36 +47,4 @@ func (c CompositeUnpacker) UnpackAll(dir string) error {
 	}
 
 	return err
-}
-
-type unzip struct {
-	logger *zap.SugaredLogger
-	dir    string
-}
-
-func (unpack *unzip) UnpackAll(dir string) error {
-	files, _ := filepath.Glob(path.Join(dir, "*.zip"))
-	for _, file := range files {
-		if err := unzipArchive(file, dir); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func unzipArchive(src string, dst string) error {
-	defer os.Remove(src)
-	// Create new extractor
-	e, err := fastzip.NewExtractor(src, dst)
-	if err != nil {
-		return fmt.Errorf("unpacking %s: %w", src, err)
-	}
-	defer e.Close()
-
-	// Extract archive files
-	if err := e.Extract(context.Background()); err != nil {
-		return fmt.Errorf("unpacking %s: %w", src, err)
-	}
-	return nil
 }

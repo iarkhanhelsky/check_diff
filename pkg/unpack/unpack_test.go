@@ -49,6 +49,10 @@ func TestNewUnpacker(t *testing.T) {
 			files: []string{"testdata/notzip.zip"},
 			errf:  "unpacking %s/notzip.zip: zip: not a valid zip file",
 		},
+		"a.tar.gz": {
+			files:       []string{"testdata/a.tar.gz"},
+			expectFiles: []string{"a.txt", "b/b.txt"},
+		},
 	}
 
 	for name, tc := range testCases {
