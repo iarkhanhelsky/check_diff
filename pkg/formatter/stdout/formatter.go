@@ -25,6 +25,8 @@ func (formatter *Formatter) Print(issues []core.Issue, w io.Writer) error {
 	formatter.writer = writer{w: w}
 
 	if len(issues) == 0 {
+		formatter.writer.color(color.FgHiWhite, color.Bold).printf(":: ").
+			color(color.FgHiGreen).printf("check_diff: No issues found\n")
 		return nil
 	}
 

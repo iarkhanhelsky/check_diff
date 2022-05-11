@@ -1,6 +1,7 @@
 package command_test
 
 import (
+	"bytes"
 	"github.com/golang/mock/gomock"
 	mockcore "github.com/iarkhanhelsky/check_diff/mocks/pkg/core"
 	mocktools "github.com/iarkhanhelsky/check_diff/mocks/pkg/tools"
@@ -34,7 +35,11 @@ func TestCheck_Run(t *testing.T) {
 
 		err string
 	}{
-		"empty input": {},
+		"empty input": {
+			env: command.Env{
+				OutWriter: &bytes.Buffer{},
+			},
+		},
 		"file input": {
 			config: core.Config{
 				InputFile:  "testdata/input.diff",

@@ -9,18 +9,33 @@ import (
 )
 
 func TestFormatter_Print(t *testing.T) {
-	assert := assert.New(t)
-	issues := []core.Issue{
-		{
-			File: "testdata/Main.java", Line: 6, Column: 9,
-			Severity: "warn", Message: "Don't do that", Source: "jlint",
+	testCases := map[string]struct {
+		issues   []core.Issue
+		expected string
+	}{
+		"formatter_Main.java": {
+			issues: []core.Issue{
+				{
+					File: "testdata/Main.java", Line: 6, Column: 9,
+					Severity: "warn", Message: "Don't do that", Source: "jlint",
+				},
+			},
+			expected: "testdata/formatter_Main.java.txt",
+		},
+		"no_issues": {
+			issues:   []core.Issue{},
+			expected: "testdata/no_issues.txt",
 		},
 	}
 
-	expectedOutput, err := ioutil.ReadFile("testdata/formatter_Main.java.txt")
-	assert.NoError(err)
-
-	var buf bytes.Buffer
-	NewFormatter().Print(issues, &buf)
-	assert.Equal(string(expectedOutput), buf.String())
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			assert := assert.New(t)
+			expected, err := ioutil.ReadFile(tc.expected)
+			assert.NoError(err)
+			var buf bytes.Buffer
+			NewFormatter().Print(tc.issues, &buf)
+			assert.Equal(string(expected), buf.String())
+		})
+	}
 }
