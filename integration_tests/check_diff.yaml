@@ -11,3 +11,6 @@ KubeLinter:
 Rubocop:
   Enabled: true
   Command: bin/rubocop
+
+golangci-lint:
+  Enabled: true

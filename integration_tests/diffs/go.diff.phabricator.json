@@ -1,0 +1,1 @@
+{"name":"typecheck","code":"typecheck","severity":"error","path":"golang/main.go","description":"x declared but not used","line":4,"char":6}

@@ -1,0 +1,10 @@
+golang/main.go:4:6
+[error] x declared but not used
+1: package main
+2:
+3: func main() {
+4: 	var x = 2
+        ^
+5: }
+
+Total: 1 in 1 files

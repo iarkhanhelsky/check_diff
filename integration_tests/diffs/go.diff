@@ -1,0 +1,11 @@
+diff --git a/golang/main.go b/golang/main.go
+index 8832935..f870555 100644
+--- a/golang/main.go
++++ b/golang/main.go
+@@ -1 +1,5 @@
+-package golang
++package main
++
++func main() {
++       var x = 2
++}
