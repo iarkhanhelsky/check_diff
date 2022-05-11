@@ -20,6 +20,7 @@ page and copy them to the desired location.
 
 ## Setup
 
+### Local
 1. Create empty `check_diff.yaml` file in your project root directory.
 2. Specify your linters configuration in `check_diff.yaml`
 3. Change any of your source files introducing lint errors
@@ -30,7 +31,24 @@ page and copy them to the desired location.
 
 ### git hooks
 
+### CI
 
+#### Gitlab
+
+See [Gitlab docs](https://docs.gitlab.com/ee/user/project/merge_requests/code_quality.html#implementing-a-custom-tool) for more information 
+
+Example step configuration
+```
+check-diff:
+  stage: test
+  script:
+    # Find merge base and make a diff. We don't need changes that appeared in
+    # upstream after feature branch was created
+    - git diff -r $(git merge-base $CI_MERGE_REQUEST_DIFF_BASE_SHA HEAD) | ./bin/check_diff --format gitlab -o .gitlab-lint
+  artifacts:
+    reports:
+      codequality: .gitlab-lint
+```
 
 ## Builtin linter bindings
 
