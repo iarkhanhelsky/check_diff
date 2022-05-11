@@ -31,6 +31,13 @@ page and copy them to the desired location.
 
 ### git hooks
 
+Create simple git hook to check each commit you made:
+`.git/hook/pre-commit`
+```
+#!/bin/bash
+git diff | bin/check_diff
+```
+
 ### CI
 
 #### Gitlab
