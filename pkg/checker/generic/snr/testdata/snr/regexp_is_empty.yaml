@@ -1,0 +1,3 @@
+ScriptAndRegexp/test:
+  Enabled: true
+  Script: testdata/snr/lint.sh

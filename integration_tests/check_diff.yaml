@@ -12,5 +12,12 @@ Rubocop:
   Enabled: true
   Command: bin/rubocop
 
-golangci-lint:
+GolangCiLint:
   Enabled: true
+
+ScriptAndRegexp/test:
+  Enabled: true
+  Script: bin/lint.sh
+  Regexp: '(?P<file>[^:]*):(?P<line>[0-9]*):(?P<message>.*)$'
+  Include:
+    - 'snr/*.txt'

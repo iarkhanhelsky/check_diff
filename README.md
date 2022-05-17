@@ -59,12 +59,13 @@ check-diff:
 
 ## Builtin linter bindings
 
-| Language | Linter                                                      | Bundled Version | Tested With  |
-|----------|-------------------------------------------------------------|-----------------|--------------|
-| Go       | [golangci-lint](pkg/checker/golang/golangci-lint/Readme.md) | 1.46.0          | -//-         |
-| Java     | [Checkstyle](pkg/checker/java/checkstyle/Readme.md)         | 9.3             | -//-         |
-| K8S      | [kube-linter](pkg/checker/k8s/kubelinter/Readme.md)         | 0.2.5           | -//-         |
-| Ruby     | [rubocop](pkg/checker/ruby/rubocop/Readme.md)               |                 | 1.25.1       |
+| Language | Linter                                                      | Bundled Version | Tested With |
+|----------|-------------------------------------------------------------|-----------------|-------------|
+| Go       | [golangci-lint](pkg/checker/golang/golangci-lint/Readme.md) | 1.46.0          | -//-        |
+| Java     | [Checkstyle](pkg/checker/java/checkstyle/Readme.md)         | 9.3             | -//-        |
+| K8S      | [kube-linter](pkg/checker/k8s/kubelinter/Readme.md)         | 0.2.5           | -//-        |
+| Ruby     | [rubocop](pkg/checker/ruby/rubocop/Readme.md)               |                 | 1.25.1      |
+|          | [Script&Regexp](pkg/checker/generic/snr/Readme.md)          |                 |             |
  
 ## Output formats
 

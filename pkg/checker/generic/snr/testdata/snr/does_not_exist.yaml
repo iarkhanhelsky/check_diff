@@ -1,0 +1,4 @@
+ScriptAndRegexp/test:
+  Enabled: true
+  Script: testdata/snr/lint1.sh
+  Regexp: '(?P<file>[^:]*):(?P<line>[0-9]*):(?P<message>.*)$'

@@ -2,6 +2,7 @@ package checker
 
 import (
 	"fmt"
+	"github.com/iarkhanhelsky/check_diff/pkg/checker/generic/snr"
 	golangci_lint "github.com/iarkhanhelsky/check_diff/pkg/checker/golang/golangci-lint"
 	"github.com/iarkhanhelsky/check_diff/pkg/checker/java/checkstyle"
 	"github.com/iarkhanhelsky/check_diff/pkg/checker/k8s/kubelinter"
@@ -16,6 +17,7 @@ type provider func(yaml *config.YAML) (core.Checker, error)
 func defaultProvider(obj core.Checker) provider {
 	return func(yaml *config.YAML) (core.Checker, error) {
 		v := obj
+		yaml.Name()
 		if err := yaml.Get(v.Tag()).Populate(v); err != nil {
 			return nil, fmt.Errorf("can't create %s: %v", v.Tag(), err)
 		}
@@ -35,6 +37,7 @@ func ProvideCheckers(checkers ...core.Checker) fx.Option {
 	for _, ch := range checkers {
 		annotated = append(annotated, fx.Annotated{Group: "checkers", Target: defaultProvider(ch)})
 	}
+	annotated = append(annotated, fx.Annotated{Group: "checkers,flatten", Target: snr.ScriptAndRegexProvider})
 
 	return fx.Provide(annotated...)
 }

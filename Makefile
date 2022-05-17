@@ -13,6 +13,7 @@ mock_clean:
 
 mockgen: mock_clean \
 		 mocks/pkg/core/checker_mock.go \
+		 mocks/pkg/core/flow_mock.go \
 		 mocks/pkg/unpack/unpacker_mock.go \
 		 mocks/pkg/shell/shell_mock.go \
          mocks/pkg/tools/registry_mock.go \

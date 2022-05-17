@@ -1,0 +1,6 @@
+snr/a.txt:1
+[] Hello, world!
+1: Hello, world!
+ ^
+
+Total: 1 in 1 files

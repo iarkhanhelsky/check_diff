@@ -46,4 +46,3 @@ jobs:
       run: |
         go mod tidy
         git diff
-
